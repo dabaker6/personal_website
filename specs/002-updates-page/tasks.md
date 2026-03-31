@@ -144,9 +144,9 @@
 
 **Purpose**: Final consistency, resilience, and verification work across all stories.
 
-- [ ] T030 [P] Run the full pytest suite and fix any regressions in `tests/test_routes.py` or related feature files.
-- [ ] T031 Review templates and CSS for mobile readability, keyboard navigation, and empty-state clarity across `/updates` and `/updates/<slug>`.
-- [ ] T032 Validate `quickstart.md` against the implemented workflow and align documentation if any paths or filenames changed.
+- [X] T030 [P] Run the full pytest suite and fix any regressions in `tests/test_routes.py` or related feature files.
+- [X] T031 Review templates and CSS for mobile readability, keyboard navigation, and empty-state clarity across `/updates` and `/updates/<slug>`.
+- [X] T032 Validate `quickstart.md` against the implemented workflow and align documentation if any paths or filenames changed.
 
 ---
 

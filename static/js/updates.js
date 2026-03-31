@@ -113,4 +113,11 @@
     setActiveTag("all");
     setActiveSort("newest");
     applyFilters();
+
+    // Pre-select a tag when arriving via a tag link (e.g. from the detail page).
+    const initialTag = new URLSearchParams(location.search).get("tag");
+    if (initialTag) {
+        setActiveTag(initialTag);
+        applyFilters();
+    }
 })();
