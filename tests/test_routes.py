@@ -95,3 +95,41 @@ def test_updates_route_renders_nav_and_newest_first_feed_order():
 
     # Feed defaults to newest-first ordering.
     assert text.index("Updates page added") < text.index("Site is live")
+
+
+def test_update_detail_route_renders_expected_entry():
+    app = create_app()
+    app.config.update(TESTING=True)
+    app.jinja_loader = ChoiceLoader(
+        [
+            DictLoader(
+                {
+                    "update_detail.html": """
+{% extends "base.html" %}
+{% block content %}
+<article>
+  <h1>{{ entry.title }}</h1>
+  <p>{{ entry.published_label }}</p>
+  <div>{{ entry.body_html|safe }}</div>
+</article>
+{% endblock %}
+"""
+                }
+            ),
+            app.jinja_loader,
+        ]
+    )
+
+    with app.test_client() as client:
+        response = client.get("/updates/2026-03-31-updates-page")
+
+    assert response.status_code == 200
+    text = response.get_data(as_text=True)
+    assert "Updates page added" in text
+    assert "31 March 2026" in text
+
+
+def test_update_detail_route_returns_404_for_missing_slug(client):
+    response = client.get("/updates/does-not-exist")
+
+    assert response.status_code == 404

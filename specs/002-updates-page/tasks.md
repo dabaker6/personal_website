@@ -66,7 +66,7 @@
 
 ### Tests for User Story 2
 
-- [ ] T012 [P] [US2] Extend `tests/test_routes.py` with coverage for `GET /updates/<slug>` success and 404 handling for missing slugs.
+- [X] T012 [P] [US2] Extend `tests/test_routes.py` with coverage for `GET /updates/<slug>` success and 404 handling for missing slugs.
 
 ### Implementation for User Story 2
 
