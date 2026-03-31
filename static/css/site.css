@@ -17,6 +17,10 @@
     box-sizing: border-box;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 html {
     scroll-behavior: smooth;
 }
@@ -361,6 +365,80 @@ a {
     margin: 0;
 }
 
+/* Updates search/filter controls + filtered-empty state (US3). */
+.updates-controls {
+    display: grid;
+    gap: 0.65rem;
+    margin-bottom: 1rem;
+}
+
+.updates-controls label {
+    margin-bottom: 0;
+}
+
+#updates-search {
+    width: 100%;
+    min-height: 2.8rem;
+    padding: 0.7rem 0.9rem;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.58);
+    color: var(--text);
+    font: inherit;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+#updates-search::placeholder {
+    color: color-mix(in srgb, var(--muted) 85%, transparent);
+}
+
+#updates-search:focus {
+    outline: none;
+    border-color: rgba(196, 87, 43, 0.55);
+    box-shadow: 0 0 0 3px rgba(196, 87, 43, 0.15);
+}
+
+[data-role="tag-controls"] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+[data-role="tag-controls"] button {
+    padding: 0.38rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid rgba(12, 91, 99, 0.22);
+    background: rgba(12, 91, 99, 0.08);
+    color: var(--support);
+    cursor: pointer;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+    transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+[data-role="tag-controls"] button:hover,
+[data-role="tag-controls"] button:focus-visible {
+    color: var(--accent-deep);
+    background: rgba(196, 87, 43, 0.12);
+    border-color: rgba(196, 87, 43, 0.28);
+}
+
+[data-role="tag-controls"] button[aria-pressed="true"] {
+    color: #fff;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    border-color: transparent;
+}
+
+[data-role="empty-filter"] {
+    margin-top: 1rem;
+}
+
+[data-role="empty-filter"][hidden] {
+    display: none;
+}
+
 /* Update detail page typography + metadata treatment (US2). */
 .panel-stack .info-card.tall-card:not([data-slug]) {
     display: grid;
@@ -518,6 +596,10 @@ a {
     .button-secondary,
     .contact-link {
         width: 100%;
+    }
+
+    [data-role="tag-controls"] button {
+        flex: 1 1 auto;
     }
 
     .cta-row {

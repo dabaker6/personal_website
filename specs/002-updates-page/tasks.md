@@ -94,7 +94,7 @@
 - [X] T018 [US3] Update `templates/updates.html` to emit search input, tag controls, empty-filter state, and searchable entry metadata attributes.
 - [X] T019 [US3] Create `static/js/updates.js` with client-side text filtering and tag-toggle behavior.
 - [X] T020 [US3] Update `templates/base.html` or `templates/updates.html` so the updates script only loads where needed.
-- [ ] T021 [US3] Extend `static/css/site.css` with search, tag, and empty-filter styling.
+- [X] T021 [US3] Extend `static/css/site.css` with search, tag, and empty-filter styling.
 
 **Checkpoint**: User Stories 1 through 3 are all independently usable.
 
