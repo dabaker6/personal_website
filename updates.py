@@ -153,3 +153,53 @@ def load_all_entries(
         entries.append(entry)
 
     return entries
+
+
+def get_feed(
+    content_dir: pathlib.Path | None = None,
+    *,
+    newest_first: bool = True,
+) -> list[UpdateEntry]:
+    """Return all published entries sorted by publication date.
+
+    - *newest_first=True* (default) → descending order, most recent at index 0.
+    - *newest_first=False* → ascending order, oldest at index 0.
+    - Entries that share the same date are secondarily sorted by slug so the
+      order is deterministic across runs.
+    - *content_dir* is forwarded to ``load_all_entries``; pass a temp directory
+      in tests to control the content set.
+    """
+    entries = load_all_entries(content_dir)
+    return sorted(
+        entries,
+        key=lambda e: (e.published_at, e.slug),
+        reverse=newest_first,
+    )
+
+
+def get_available_tags(entries: list[UpdateEntry]) -> list[str]:
+    """Return a sorted, deduplicated list of tags from *entries*.
+
+    Accepts a pre-loaded entry list rather than re-scanning the filesystem so
+    the feed template can call ``get_feed`` once and derive tags from the same
+    snapshot without a second directory scan.
+    """
+    seen: set[str] = set()
+    for entry in entries:
+        seen.update(entry.tags)
+    return sorted(seen)
+
+
+def get_entry_by_slug(
+    slug: str,
+    content_dir: pathlib.Path | None = None,
+) -> UpdateEntry | None:
+    """Return the published entry whose slug matches *slug*, or None.
+
+    Used by the detail route to look up a single entry.  Draft entries are
+    excluded; requesting a draft slug returns None so the route can 404.
+    """
+    for entry in load_all_entries(content_dir):
+        if entry.slug == slug:
+            return entry
+    return None
