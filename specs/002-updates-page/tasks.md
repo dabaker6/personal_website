@@ -132,9 +132,9 @@
 
 ### Implementation for User Story 5
 
-- [ ] T027 [US5] Update `updates.py` to support configurable content roots for testing and future reuse.
-- [ ] T028 [US5] Add sample draft and malformed fixture content under test-controlled paths or helper setup in `tests/test_routes.py`.
-- [ ] T029 [US5] Update `README.md` with the authoring workflow for adding a new update file without code changes.
+- [X] T027 [US5] Update `updates.py` to support configurable content roots for testing and future reuse.
+- [X] T028 [US5] Add sample draft and malformed fixture content under test-controlled paths or helper setup in `tests/test_routes.py`.
+- [X] T029 [US5] Update `README.md` with the authoring workflow for adding a new update file without code changes.
 
 **Checkpoint**: The authoring workflow is verified end-to-end.
 
