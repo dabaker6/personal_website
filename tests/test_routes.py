@@ -133,3 +133,20 @@ def test_update_detail_route_returns_404_for_missing_slug(client):
     response = client.get("/updates/does-not-exist")
 
     assert response.status_code == 404
+
+
+def test_updates_feed_exposes_search_and_filter_markers_for_client_side_behavior(client):
+    response = client.get("/updates")
+
+    assert response.status_code == 200
+    text = response.get_data(as_text=True)
+
+    # Search control needed by upcoming client-side filtering script.
+    assert 'id="updates-search"' in text
+
+    # Tag controls container + at least one concrete tag control hook.
+    assert 'data-role="tag-controls"' in text
+    assert 'data-tag="release"' in text
+
+    # Per-entry searchable corpus marker used by the client-side search pass.
+    assert 'data-search-text=' in text

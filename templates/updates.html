@@ -9,9 +9,33 @@
 
 <section class="panel-stack">
     {% if entries %}
+    <div class="updates-controls">
+        <label for="updates-search" class="eyebrow">Search</label>
+        <input
+            id="updates-search"
+            name="updates-search"
+            type="search"
+            placeholder="Search updates"
+            autocomplete="off"
+        >
+
+        <div data-role="tag-controls" aria-label="Filter by tag">
+            <button type="button" data-tag="all" aria-pressed="true">all</button>
+            {% for tag in available_tags %}
+            <button type="button" data-tag="{{ tag|e }}" aria-pressed="false">{{ tag }}</button>
+            {% endfor %}
+        </div>
+    </div>
+
     <div class="card-grid">
         {% for entry in entries %}
-        <article class="info-card tall-card" data-slug="{{ entry.slug }}" data-date="{{ entry.published_at.isoformat() }}">
+        <article
+            class="info-card tall-card"
+            data-slug="{{ entry.slug }}"
+            data-date="{{ entry.published_at.isoformat() }}"
+            data-tags="{{ entry.tags|join(' ')|lower|e }}"
+            data-search-text="{{ (entry.title ~ ' ' ~ entry.summary ~ ' ' ~ entry.body_text ~ ' ' ~ (entry.tags|join(' ')))|lower|e }}"
+        >
             <p class="eyebrow">{{ entry.published_label }}</p>
             <h2><a href="/updates/{{ entry.slug }}">{{ entry.title }}</a></h2>
             {% if entry.summary %}
@@ -28,6 +52,11 @@
         </article>
         {% endfor %}
     </div>
+
+    <article class="fallback-card" data-role="empty-filter" hidden>
+        <h2>{{ empty_filter_title }}</h2>
+        <p>Try a different search term or clear the active tag filter.</p>
+    </article>
     {% else %}
     <article class="fallback-card">
         <h2>{{ empty_state_title }}</h2>

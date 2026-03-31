@@ -87,11 +87,11 @@
 
 ### Tests for User Story 3
 
-- [ ] T017 [P] [US3] Extend `tests/test_routes.py` to verify the feed HTML exposes the search field, tag controls, and searchable content markers needed by the client-side behavior.
+- [X] T017 [P] [US3] Extend `tests/test_routes.py` to verify the feed HTML exposes the search field, tag controls, and searchable content markers needed by the client-side behavior.
 
 ### Implementation for User Story 3
 
-- [ ] T018 [US3] Update `templates/updates.html` to emit search input, tag controls, empty-filter state, and searchable entry metadata attributes.
+- [X] T018 [US3] Update `templates/updates.html` to emit search input, tag controls, empty-filter state, and searchable entry metadata attributes.
 - [ ] T019 [US3] Create `static/js/updates.js` with client-side text filtering and tag-toggle behavior.
 - [ ] T020 [US3] Update `templates/base.html` or `templates/updates.html` so the updates script only loads where needed.
 - [ ] T021 [US3] Extend `static/css/site.css` with search, tag, and empty-filter styling.
