@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from flask import Flask, render_template
+from flask import Flask, abort, render_template
 
-from updates import get_feed, get_available_tags
+from updates import get_available_tags, get_entry_by_slug, get_feed
 
 from content import get_page, get_site_content
 
@@ -68,6 +68,22 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
             default_sort="newest",
             empty_state_title="No updates published yet.",
             empty_filter_title="No entries found.",
+        )
+
+    @app.route("/updates/<slug>")
+    def update_detail(slug: str) -> str:
+        entry = get_entry_by_slug(slug)
+        if entry is None:
+            abort(404)
+
+        return render_template(
+            "update_detail.html",
+            page={
+                "title": entry.title,
+                "meta_description": entry.summary or entry.title,
+            },
+            page_name="updates",
+            entry=entry,
         )
 
     return app

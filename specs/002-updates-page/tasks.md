@@ -70,8 +70,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T013 [US2] Add Markdown-to-HTML rendering and single-entry lookup helpers to `updates.py`.
-- [ ] T014 [US2] Add the `/updates/<slug>` route to `app.py` with published-only access rules.
+- [X] T013 [US2] Add Markdown-to-HTML rendering and single-entry lookup helpers to `updates.py`.
+- [X] T014 [US2] Add the `/updates/<slug>` route to `app.py` with published-only access rules.
 - [ ] T015 [US2] Create `templates/update_detail.html` with entry metadata, rendered body, tag links, and a back-to-feed control.
 - [ ] T016 [US2] Extend `static/css/site.css` with detail-page typography and metadata styling.
 
