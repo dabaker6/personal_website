@@ -150,3 +150,20 @@ def test_updates_feed_exposes_search_and_filter_markers_for_client_side_behavior
 
     # Per-entry searchable corpus marker used by the client-side search pass.
     assert 'data-search-text=' in text
+
+
+def test_updates_feed_exposes_sort_control_for_client_side_behavior(client):
+    response = client.get("/updates")
+
+    assert response.status_code == 200
+    text = response.get_data(as_text=True)
+
+    # Sort controls container present and wired for JS behaviour.
+    assert 'data-role="sort-controls"' in text
+
+    # Both sort options must be present.
+    assert 'data-sort="newest"' in text
+    assert 'data-sort="oldest"' in text
+
+    # Default sort is newest-first.
+    assert 'data-sort="newest" aria-pressed="true"' in text

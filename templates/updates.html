@@ -25,6 +25,11 @@
             <button type="button" data-tag="{{ tag|e }}" aria-pressed="false">{{ tag }}</button>
             {% endfor %}
         </div>
+
+        <div data-role="sort-controls" aria-label="Sort order">
+            <button type="button" data-sort="newest" aria-pressed="true">newest first</button>
+            <button type="button" data-sort="oldest" aria-pressed="false">oldest first</button>
+        </div>
     </div>
 
     <div class="card-grid">
