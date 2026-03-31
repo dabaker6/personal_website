@@ -18,7 +18,7 @@
 **Purpose**: Add the minimal project scaffolding needed for Markdown-backed updates.
 
 - [X] T001 Update `requirements.txt` with Markdown and frontmatter parsing dependencies.
-- [ ] T002 Update `README.md` with local run and verification notes for the Updates feature.
+- [X] T002 Update `README.md` with local run and verification notes for the Updates feature.
 - [ ] T003 Create the `content/updates/` directory and add two valid sample entries for local development.
 
 ---
