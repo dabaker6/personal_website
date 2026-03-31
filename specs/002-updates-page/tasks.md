@@ -128,7 +128,7 @@
 
 ### Tests for User Story 5
 
-- [ ] T026 [P] [US5] Extend `tests/test_routes.py` with coverage for draft exclusion and malformed-entry resilience using temporary content fixtures or overrides.
+- [X] T026 [P] [US5] Extend `tests/test_routes.py` with coverage for draft exclusion and malformed-entry resilience using temporary content fixtures or overrides.
 
 ### Implementation for User Story 5
 

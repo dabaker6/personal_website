@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import pathlib
+import textwrap
+
 import pytest
 from jinja2 import ChoiceLoader, DictLoader
 
 from app import create_app
+from updates import get_feed, load_all_entries
 
 
 @pytest.fixture()
@@ -167,3 +171,68 @@ def test_updates_feed_exposes_sort_control_for_client_side_behavior(client):
 
     # Default sort is newest-first.
     assert 'data-sort="newest" aria-pressed="true"' in text
+
+
+# ---------------------------------------------------------------------------
+# US5: content loader resilience (draft exclusion + malformed-file safety)
+# ---------------------------------------------------------------------------
+
+def test_draft_entry_is_excluded_from_public_feed(tmp_path: pathlib.Path):
+    """Entries with draft: true must not appear in the public feed."""
+    (tmp_path / "published.md").write_text(
+        textwrap.dedent("""\
+            ---
+            title: Published post
+            date: 2026-03-30
+            ---
+            Body text here.
+        """),
+        encoding="utf-8",
+    )
+    (tmp_path / "draft-post.md").write_text(
+        textwrap.dedent("""\
+            ---
+            title: Draft post
+            date: 2026-03-31
+            draft: true
+            ---
+            Work in progress.
+        """),
+        encoding="utf-8",
+    )
+
+    entries = get_feed(content_dir=tmp_path)
+
+    slugs = [e.slug for e in entries]
+    assert "published" in slugs
+    assert "draft-post" not in slugs
+
+
+def test_malformed_entry_is_skipped_without_raising(tmp_path: pathlib.Path):
+    """A file missing required frontmatter fields must be silently skipped."""
+    (tmp_path / "valid.md").write_text(
+        textwrap.dedent("""\
+            ---
+            title: Valid post
+            date: 2026-03-30
+            ---
+            Body text here.
+        """),
+        encoding="utf-8",
+    )
+    # Missing both title and date — _parse_entry raises ValueError.
+    (tmp_path / "malformed.md").write_text(
+        textwrap.dedent("""\
+            ---
+            summary: No title or date here
+            ---
+            This file has no required frontmatter.
+        """),
+        encoding="utf-8",
+    )
+
+    # Should not raise; malformed file is silently dropped.
+    entries = load_all_entries(content_dir=tmp_path)
+
+    assert len(entries) == 1
+    assert entries[0].slug == "valid"
