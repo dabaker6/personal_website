@@ -314,6 +314,53 @@ a {
     margin: 0;
 }
 
+/* Updates feed card treatment (US1). */
+.info-card[data-slug] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.info-card[data-slug] .eyebrow {
+    margin-bottom: 0;
+}
+
+.info-card[data-slug] h2 a {
+    text-decoration: none;
+    color: var(--text);
+    transition: color 160ms ease;
+}
+
+.info-card[data-slug] h2 a:hover,
+.info-card[data-slug] h2 a:focus-visible {
+    color: var(--accent-deep);
+}
+
+.info-card[data-slug] ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.info-card[data-slug] li {
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(12, 91, 99, 0.22);
+    background: rgba(12, 91, 99, 0.08);
+    color: var(--support);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+}
+
+.info-card[data-slug] p {
+    margin: 0;
+}
+
 @media (max-width: 860px) {
     .site-header,
     .site-footer,
