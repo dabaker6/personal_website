@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-intro">
+    <p class="eyebrow">{{ page.eyebrow }}</p>
+    <h1>{{ page.headline }}</h1>
+    <p class="lead-copy">{{ page.intro }}</p>
+</section>
+
+<section class="panel-stack">
+    {% if contact_methods %}
+    <div class="card-grid">
+        {% for method in contact_methods %}
+        <article class="contact-card">
+            <p class="contact-label">{{ method.label }}</p>
+            <a class="contact-link" href="{{ method.href }}">{{ method.value }}</a>
+            <p class="contact-note">{{ method.note }}</p>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <article class="fallback-card">
+        <h2>{{ page.fallback_title }}</h2>
+        <p>{{ page.fallback_body }}</p>
+    </article>
+    {% endif %}
+</section>
+{% endblock %}

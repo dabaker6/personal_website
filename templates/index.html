@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-panel">
+    <div class="eyebrow">{{ page.eyebrow }}</div>
+    <div class="hero-grid">
+        <div>
+            <h1 class="hero-title">{{ page.hero_title }}</h1>
+            <p class="hero-copy">{{ page.hero_body }}</p>
+            <div class="cta-row">
+                <a class="button-primary" href="{{ url_for(page.primary_cta.endpoint) }}">{{ page.primary_cta.label }}</a>
+                <a class="button-secondary" href="{{ url_for(page.secondary_cta.endpoint) }}">{{ page.secondary_cta.label }}</a>
+            </div>
+        </div>
+        <aside class="hero-aside">
+            <p class="aside-label">Identity</p>
+            <p class="aside-value">{{ site.name }}</p>
+            <p class="aside-detail">{{ site.description }}</p>
+            <p class="aside-meta">{{ site.location }}</p>
+        </aside>
+    </div>
+</section>
+
+<section class="panel-stack">
+    <div class="section-heading">
+        <p class="eyebrow">Focus</p>
+        <h2>Built to introduce, explain, and stay ready for what comes next.</h2>
+    </div>
+    <div class="card-grid three-up">
+        {% for item in page.highlights %}
+        <article class="info-card">
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.body }}</p>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="panel-stack split-panels">
+    {% for panel in page.feature_panels %}
+    <article class="feature-panel">
+        <p class="eyebrow">{{ panel.label }}</p>
+        <h2>{{ panel.title }}</h2>
+        <p>{{ panel.body }}</p>
+    </article>
+    {% endfor %}
+</section>
+{% endblock %}
