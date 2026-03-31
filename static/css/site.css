@@ -361,6 +361,124 @@ a {
     margin: 0;
 }
 
+/* Update detail page typography + metadata treatment (US2). */
+.panel-stack .info-card.tall-card:not([data-slug]) {
+    display: grid;
+    gap: 1rem;
+    min-height: auto;
+}
+
+.panel-stack .info-card.tall-card:not([data-slug]) > ul:first-of-type {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.panel-stack .info-card.tall-card:not([data-slug]) > ul:first-of-type li {
+    margin: 0;
+}
+
+.panel-stack .info-card.tall-card:not([data-slug]) > ul:first-of-type a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid rgba(12, 91, 99, 0.22);
+    background: rgba(12, 91, 99, 0.08);
+    color: var(--support);
+    text-decoration: none;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+    transition: background-color 160ms ease, color 160ms ease;
+}
+
+.panel-stack .info-card.tall-card:not([data-slug]) > ul:first-of-type a:hover,
+.panel-stack .info-card.tall-card:not([data-slug]) > ul:first-of-type a:focus-visible {
+    color: var(--accent-deep);
+    background: rgba(196, 87, 43, 0.12);
+}
+
+.panel-stack .info-card.tall-card:not([data-slug]) > div {
+    color: var(--muted);
+    font-size: 1.03rem;
+    line-height: 1.72;
+}
+
+.panel-stack .info-card.tall-card:not([data-slug]) > div > *:first-child {
+    margin-top: 0;
+}
+
+.panel-stack .info-card.tall-card:not([data-slug]) > div > *:last-child {
+    margin-bottom: 0;
+}
+
+.panel-stack .info-card.tall-card:not([data-slug]) > div h1,
+.panel-stack .info-card.tall-card:not([data-slug]) > div h2,
+.panel-stack .info-card.tall-card:not([data-slug]) > div h3,
+.panel-stack .info-card.tall-card:not([data-slug]) > div h4 {
+    margin: 1.25rem 0 0.55rem;
+    color: var(--text);
+    letter-spacing: -0.03em;
+    line-height: 1.18;
+}
+
+.panel-stack .info-card.tall-card:not([data-slug]) > div p,
+.panel-stack .info-card.tall-card:not([data-slug]) > div ul,
+.panel-stack .info-card.tall-card:not([data-slug]) > div ol,
+.panel-stack .info-card.tall-card:not([data-slug]) > div blockquote,
+.panel-stack .info-card.tall-card:not([data-slug]) > div pre {
+    margin: 0.75rem 0;
+}
+
+.panel-stack .info-card.tall-card:not([data-slug]) > div ul,
+.panel-stack .info-card.tall-card:not([data-slug]) > div ol {
+    padding-left: 1.35rem;
+}
+
+.panel-stack .info-card.tall-card:not([data-slug]) > div a {
+    color: var(--accent-deep);
+}
+
+.panel-stack .info-card.tall-card:not([data-slug]) > div code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9em;
+    background: rgba(24, 22, 26, 0.08);
+    padding: 0.12rem 0.35rem;
+    border-radius: 0.35rem;
+}
+
+.panel-stack .info-card.tall-card:not([data-slug]) > div pre {
+    padding: 0.95rem 1rem;
+    border-radius: 14px;
+    background: rgba(24, 22, 26, 0.9);
+    color: #f8f6f3;
+    overflow-x: auto;
+}
+
+.panel-stack .info-card.tall-card:not([data-slug]) > div pre code {
+    background: transparent;
+    padding: 0;
+    color: inherit;
+}
+
+.panel-stack .info-card.tall-card:not([data-slug]) > div blockquote {
+    margin-left: 0;
+    padding-left: 0.9rem;
+    border-left: 3px solid rgba(196, 87, 43, 0.5);
+    color: var(--text);
+}
+
+.panel-stack .info-card.tall-card:not([data-slug]) > .cta-row {
+    margin-top: 0.3rem;
+    justify-content: flex-start;
+}
+
 @media (max-width: 860px) {
     .site-header,
     .site-footer,
