@@ -46,7 +46,7 @@
 
 ### Tests for User Story 1
 
-- [ ] T008 [P] [US1] Extend `tests/test_routes.py` with coverage for `GET /updates`, navigation visibility, and newest-first feed ordering.
+- [X] T008 [P] [US1] Extend `tests/test_routes.py` with coverage for `GET /updates`, navigation visibility, and newest-first feed ordering.
 
 ### Implementation for User Story 1
 
