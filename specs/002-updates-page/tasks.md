@@ -51,7 +51,7 @@
 ### Implementation for User Story 1
 
 - [X] T009 [US1] Add the `/updates` route to `app.py` and connect it to the loader in `updates.py`.
-- [ ] T010 [US1] Create `templates/updates.html` for the server-rendered feed layout and empty state.
+- [X] T010 [US1] Create `templates/updates.html` for the server-rendered feed layout and empty state.
 - [ ] T011 [US1] Extend `static/css/site.css` with feed-page styling that matches the existing visual system.
 
 **Checkpoint**: User Story 1 is fully functional and testable on its own.

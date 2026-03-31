@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-intro">
+    <p class="eyebrow">{{ page.eyebrow }}</p>
+    <h1>{{ page.headline }}</h1>
+    <p class="lead-copy">{{ page.intro }}</p>
+</section>
+
+<section class="panel-stack">
+    {% if entries %}
+    <div class="card-grid">
+        {% for entry in entries %}
+        <article class="info-card tall-card" data-slug="{{ entry.slug }}" data-date="{{ entry.published_at.isoformat() }}">
+            <p class="eyebrow">{{ entry.published_label }}</p>
+            <h2><a href="/updates/{{ entry.slug }}">{{ entry.title }}</a></h2>
+            {% if entry.summary %}
+            <p>{{ entry.summary }}</p>
+            {% endif %}
+
+            {% if entry.tags %}
+            <ul>
+                {% for tag in entry.tags %}
+                <li>{{ tag }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <article class="fallback-card">
+        <h2>{{ empty_state_title }}</h2>
+        <p>No entries are published yet. Add a Markdown file to <strong>content/updates/</strong> and refresh this page.</p>
+    </article>
+    {% endif %}
+</section>
+{% endblock %}
