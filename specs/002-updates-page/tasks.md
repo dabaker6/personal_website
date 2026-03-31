@@ -50,7 +50,7 @@
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Add the `/updates` route to `app.py` and connect it to the loader in `updates.py`.
+- [X] T009 [US1] Add the `/updates` route to `app.py` and connect it to the loader in `updates.py`.
 - [ ] T010 [US1] Create `templates/updates.html` for the server-rendered feed layout and empty state.
 - [ ] T011 [US1] Extend `static/css/site.css` with feed-page styling that matches the existing visual system.
 

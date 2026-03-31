@@ -48,12 +48,26 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
     @app.route("/updates")
     def updates() -> str:
         feed = get_feed()
+        page = {
+            "title": "Updates",
+            "meta_description": "Blog-style updates, release notes, and build logs.",
+            "eyebrow": "Updates",
+            "headline": "Notes from the build log",
+            "intro": (
+                "Recent progress, release notes, and implementation details. "
+                "Entries are listed newest first and can be filtered client-side."
+            ),
+        }
+
         return render_template(
             "updates.html",
-            page={"title": "Updates", "meta_description": "Site updates and notes."},
+            page=page,
             page_name="updates",
             entries=feed,
             available_tags=get_available_tags(feed),
+            default_sort="newest",
+            empty_state_title="No updates published yet.",
+            empty_filter_title="No entries found.",
         )
 
     return app
