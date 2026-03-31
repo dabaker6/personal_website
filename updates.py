@@ -107,3 +107,49 @@ def _parse_entry(path: pathlib.Path) -> UpdateEntry:
         draft=bool(post.get("draft") or False),
         source_path=path,
     )
+
+
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
+
+def load_entry(path: pathlib.Path) -> UpdateEntry | None:
+    """Parse one Markdown file and return an UpdateEntry, or None on failure.
+
+    Any exception raised by _parse_entry (missing fields, bad date, unreadable
+    file) is caught and silently discarded so a single bad file never prevents
+    the rest of the feed from loading.
+    """
+    try:
+        return _parse_entry(path)
+    except Exception:
+        return None
+
+
+def load_all_entries(
+    content_dir: pathlib.Path | None = None,
+    *,
+    include_drafts: bool = False,
+) -> list[UpdateEntry]:
+    """Scan *content_dir* for .md files and return valid, non-draft entries.
+
+    - Files that fail to parse are silently skipped (FR-011).
+    - Entries with ``draft=True`` are excluded unless *include_drafts* is set
+      (FR-010).
+    - The returned list is in filesystem order; callers are responsible for
+      sorting (T006 adds the sorted helper on top of this).
+    - *content_dir* defaults to ``content/updates/`` next to this file so the
+      production app requires no argument while tests can supply a temp dir.
+    """
+    directory = content_dir if content_dir is not None else _CONTENT_DIR
+
+    entries: list[UpdateEntry] = []
+    for path in sorted(directory.glob("*.md")):
+        entry = load_entry(path)
+        if entry is None:
+            continue
+        if entry.draft and not include_drafts:
+            continue
+        entries.append(entry)
+
+    return entries

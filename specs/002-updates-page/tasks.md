@@ -30,7 +30,7 @@
 **⚠️ CRITICAL**: No user story work should start until this phase is complete.
 
 - [X] T004 Create `updates.py` with entry parsing, frontmatter validation, slug generation, and date normalization helpers.
-- [ ] T005 [P] Add malformed-entry skipping and draft exclusion behavior in `updates.py`.
+- [X] T005 [P] Add malformed-entry skipping and draft exclusion behavior in `updates.py`.
 - [ ] T006 [P] Add feed-level helpers in `updates.py` for sorted published entries and unique tag aggregation.
 - [ ] T007 Update `content.py` navigation data to include the `Updates` nav item while preserving the existing structure.
 
