@@ -113,7 +113,7 @@
 ### Implementation for User Story 4
 
 - [X] T023 [US4] Update `templates/updates.html` with a sort control that works with the existing client-side filter model.
-- [ ] T024 [US4] Extend `static/js/updates.js` to support newest-first and oldest-first ordering for the currently filtered results.
+- [X] T024 [US4] Extend `static/js/updates.js` to support newest-first and oldest-first ordering for the currently filtered results.
 - [ ] T025 [US4] Extend `static/css/site.css` with sort-control styling.
 
 **Checkpoint**: Sorting works alongside search and tag filtering.
