@@ -4,6 +4,8 @@ from typing import Any
 
 from flask import Flask, render_template
 
+from updates import get_feed, get_available_tags
+
 from content import get_page, get_site_content
 
 
@@ -41,6 +43,17 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
             "contact.html",
             page=get_page(site_content, "contact"),
             page_name="contact",
+        )
+
+    @app.route("/updates")
+    def updates() -> str:
+        feed = get_feed()
+        return render_template(
+            "updates.html",
+            page={"title": "Updates", "meta_description": "Site updates and notes."},
+            page_name="updates",
+            entries=feed,
+            available_tags=get_available_tags(feed),
         )
 
     return app

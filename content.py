@@ -20,6 +20,7 @@ SITE_CONTENT: dict[str, Any] = {
         {"label": "Home", "endpoint": "home", "slug": "home"},
         {"label": "About", "endpoint": "about", "slug": "about"},
         {"label": "Contact", "endpoint": "contact", "slug": "contact"},
+        {"label": "Updates", "endpoint": "updates", "slug": "updates"},
     ],
     "pages": {
         "home": {
