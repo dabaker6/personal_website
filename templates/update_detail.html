@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-intro">
+    <p class="eyebrow">Update Entry</p>
+    <h1>{{ entry.title }}</h1>
+    <p class="lead-copy">Published {{ entry.published_label }}</p>
+</section>
+
+<section class="panel-stack">
+    <article class="info-card tall-card">
+        {% if entry.tags %}
+        <ul>
+            {% for tag in entry.tags %}
+            <li><a href="/updates?tag={{ tag|urlencode }}">{{ tag }}</a></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <div>{{ entry.body_html | safe }}</div>
+
+        <div class="cta-row">
+            <a class="button-secondary" href="/updates">Back to Updates</a>
+        </div>
+    </article>
+</section>
+{% endblock %}
