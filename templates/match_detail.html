@@ -1,13 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="page-intro">
-    <p class="eyebrow">Match summary</p>
-    <h1>{{ match_id }}</h1>
-    <p class="lead-copy">Brief detail extracted from the info section of the selected match document.</p>
-</section>
 
 <section class="panel-stack">
+    <p class="eyebrow">Match summary</p>
+    <p class="lead-copy">Brief detail extracted from the info section of the selected match document.</p>
     {% if error_message %}
     <article class="fallback-card" role="status">
         <h2>Summary unavailable</h2>
@@ -31,7 +28,9 @@
             <a class="button-secondary" href="{{ back_url }}">Back to search results</a>
         </div>
     </article>
+</section>
 
+<section class="panel-stack">
     <section class="scorecard-stack" aria-label="Match scorecard">
         <div class="section-heading">
             <p class="eyebrow">Scorecard</p>
