@@ -615,6 +615,7 @@ a {
 
 .matches-grid input,
 .matches-grid select {
+    width: 100%;
     min-height: 2.6rem;
     padding: 0.6rem 0.7rem;
     border-radius: 10px;
@@ -637,12 +638,16 @@ a {
 }
 
 .date-range-fieldset legend {
+    float: left;
+    width: 100%;
+    margin: 0 0 0.75rem;
     padding: 0;
 }
 
 .date-range-row {
+    clear: both;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 0.55rem;
 }
 
@@ -655,6 +660,34 @@ a {
 .date-range-row label span {
     font-size: 0.88rem;
     color: var(--muted);
+}
+
+.date-range-row .date-range-label {
+    margin: 0;
+}
+
+.matches-grid .date-range-input {
+    width: 100%;
+    min-height: 2.6rem;
+    padding: 0.6rem 0.7rem;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--text);
+    font: inherit;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.matches-grid .date-range-input:focus {
+    outline: none;
+    border-color: rgba(196, 87, 43, 0.55);
+    box-shadow: 0 0 0 3px rgba(196, 87, 43, 0.14);
+}
+
+.flatpickr-calendar {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
 }
 
 .match-summary-card {

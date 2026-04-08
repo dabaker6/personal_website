@@ -23,12 +23,16 @@
                 <legend class="eyebrow">Date range</legend>
                 <div class="date-range-row">
                     <label>
-                        <span>From</span>
-                        <input type="date" name="fromDate" value="{{ query.fromDate }}">
-                    </label>
-                    <label>
-                        <span>To</span>
-                        <input type="date" name="toDate" value="{{ query.toDate }}">
+                        <span class="eyebrow date-range-label">From and To</span>
+                        <input
+                            id="date-range-input"
+                            class="date-range-input"
+                            type="text"
+                            placeholder="Select date range"
+                            autocomplete="off"
+                        >
+                        <input type="hidden" name="fromDate" value="{{ query.fromDate }}">
+                        <input type="hidden" name="toDate" value="{{ query.toDate }}">
                     </label>
                 </div>
             </fieldset>
@@ -115,4 +119,7 @@
         {% endif %}
     {% endif %}
 </section>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="{{ url_for('static', filename='js/matches.js') }}"></script>
 {% endblock %}
