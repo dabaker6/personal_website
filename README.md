@@ -1,6 +1,7 @@
 # Personal Website
 
 This repository contains a small server-rendered Flask personal website with three primary pages: landing, about, and contact.
+It also includes an API-backed matches browser at `/matches`.
 
 ## Stack
 
@@ -28,6 +29,14 @@ This repository contains a small server-rendered Flask personal website with thr
    ```
 
 4. Open `http://127.0.0.1:5000`.
+
+### Configure matches API endpoint
+
+The matches feature calls an upstream backend API. Set `MATCHES_API_BASE_URL` before starting Flask.
+
+```powershell
+$env:MATCHES_API_BASE_URL = "http://127.0.0.1:8000/api/v1"
+```
 
 ## Run tests
 

@@ -2,11 +2,21 @@ from __future__ import annotations
 
 from typing import Any
 
-from flask import Flask, abort, render_template
+from flask import Flask, abort, render_template, request, url_for
+
+from dotenv import load_dotenv
 
 from updates import get_available_tags, get_entry_by_slug, get_feed
 
 from content import get_page, get_site_content
+from matches_api import (
+    BrowseQuery,
+    MatchesApiError,
+    browse_matches,
+    build_info_summary,
+    format_date_range,
+    get_match_detail,
+)
 
 
 def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
@@ -86,8 +96,77 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
             entry=entry,
         )
 
+    @app.route("/matches")
+    def matches() -> str:
+        query = BrowseQuery.from_args(request.args.to_dict(flat=True))
+        matches_list = []
+        has_more = False
+        total_matched = None
+        error_message = None
+
+        if query.has_filters():
+            try:
+                matches_list, has_more, total_matched = browse_matches(query)
+            except MatchesApiError as exc:
+                error_message = str(exc)
+
+        return render_template(
+            "matches.html",
+            page={
+                "title": "Matches",
+                "meta_description": "Search matches with backend API filters and view match summaries.",
+                "eyebrow": "Matches",
+                "headline": "Browse and inspect matches",
+                "intro": "Use filters to find matches, then select a result to view a short summary from match info.",
+            },
+            page_name="matches",
+            query=query,
+            matches=matches_list,
+            has_more=has_more,
+            total_matched=total_matched,
+            error_message=error_message,
+        )
+
+    @app.route("/matches/<match_id>")
+    def match_detail(match_id: str) -> str:
+        query = BrowseQuery.from_args(request.args.to_dict(flat=True))
+
+        try:
+            detail = get_match_detail(match_id)
+            summary = build_info_summary(match_id, detail)
+        except MatchesApiError as exc:
+            return render_template(
+                "match_detail.html",
+                page={
+                    "title": "Match detail unavailable",
+                    "meta_description": "Unable to load selected match summary.",
+                },
+                page_name="matches",
+                match_id=match_id,
+                summary=None,
+                error_message=str(exc),
+                query=query,
+                format_date_range=format_date_range,
+            ), 502
+
+        return render_template(
+            "match_detail.html",
+            page={
+                "title": f"Match {match_id}",
+                "meta_description": "Brief summary from the match document info section.",
+            },
+            page_name="matches",
+            match_id=match_id,
+            summary=summary,
+            error_message=None,
+            query=query,
+            format_date_range=format_date_range,
+            back_url=url_for("matches", **query.to_query_params()),
+        )
+
     return app
 
+load_dotenv()  # Load environment variables from .env file
 
 app = create_app()
 

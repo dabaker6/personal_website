@@ -1,0 +1,124 @@
+openapi: 3.0.3
+info:
+  title: Cricsheet Ball-by-Ball Read API
+  version: 1.0.0
+  description: Read-only API for filtered browse and match document retrieval.
+servers:
+  - url: /api/v1
+paths:
+  /matches/browse:
+    get:
+      summary: Browse matches by filter criteria
+      parameters:
+        - in: query
+          name: gender
+          schema: { type: string }
+        - in: query
+          name: fromDate
+          schema: { type: string, format: date }
+        - in: query
+          name: toDate
+          schema: { type: string, format: date }
+        - in: query
+          name: venue
+          schema: { type: string }
+        - in: query
+          name: matchType
+          schema: { type: string }
+        - in: query
+          name: eventName
+          schema: { type: string }
+        - in: query
+          name: team
+          schema: { type: string }
+      responses:
+        '200':
+          description: Browse results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrowseResponse'
+        '400':
+          description: Validation failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '503':
+          description: Provider unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /matches/{matchId}:
+    get:
+      summary: Retrieve full match document by identifier
+      parameters:
+        - in: path
+          name: matchId
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Full match document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailResponse'
+        '404':
+          description: Match not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '503':
+          description: Provider unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+components:
+  schemas:
+    MatchSummary:
+      type: object
+      required: [matchId, teams, venue, competition, date]
+      properties:
+        matchId: { type: string }
+        teams:
+          type: array
+          items: { type: string }
+          minItems: 2
+        venue: { type: string }
+        competition: { type: string }
+        date: { type: string, format: date }
+    BrowseResponse:
+      type: object
+      required: [items, hasMore]
+      properties:
+        items:
+          type: array
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/MatchSummary'
+        hasMore: { type: boolean }
+        totalMatched:
+          type: integer
+          minimum: 0
+    DetailResponse:
+      type: object
+      required: [matchId, document]
+      properties:
+        matchId: { type: string }
+        document:
+          type: object
+          additionalProperties: true
+    ApiError:
+      type: object
+      required: [code, message, correlationId]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        correlationId: { type: string }
+        details:
+          type: object
+          additionalProperties: true

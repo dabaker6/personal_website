@@ -30,13 +30,14 @@ def test_home_route_returns_server_rendered_html(client):
     assert "About" in text
     assert "Contact" in text
     assert "Updates" in text
+    assert "Matches" in text
 
 
 @pytest.mark.parametrize(
     ("route", "marker"),
     [
         ("/about", "I care about restraint, rhythm, and reliable systems."),
-        ("/contact", "Simple public contact, no workflow overhead."),
+        ("/contact", "The first release keeps contact straightforward: public channels only."),
     ],
 )
 def test_secondary_routes_render_expected_content(client, route, marker):
@@ -94,6 +95,7 @@ def test_updates_route_renders_nav_and_newest_first_feed_order():
     assert "About" in text
     assert "Contact" in text
     assert "Updates" in text
+    assert "Matches" in text
     assert "Updates page added" in text
     assert "Site is live" in text
 
@@ -171,6 +173,103 @@ def test_updates_feed_exposes_sort_control_for_client_side_behavior(client):
 
     # Default sort is newest-first.
     assert 'data-sort="newest" aria-pressed="true"' in text
+
+
+def test_matches_route_renders_form_controls(client):
+    response = client.get("/matches")
+
+    assert response.status_code == 200
+    text = response.get_data(as_text=True)
+
+    assert "Browse and inspect matches" in text
+    assert 'name="gender"' in text
+    assert 'name="fromDate"' in text
+    assert 'name="toDate"' in text
+    assert 'name="matchType"' in text
+    assert 'name="venue"' in text
+    assert 'name="eventName"' in text
+    assert 'name="team"' in text
+
+
+def test_matches_route_shows_results_from_browse_api(monkeypatch):
+    app = create_app()
+    app.config.update(TESTING=True)
+
+    def _fake_browse(query):
+        assert query.gender == "male"
+        return (
+            [
+                type("Summary", (), {
+                    "match_id": "abc123",
+                    "teams": ["England", "India"],
+                    "venue": "M Chinnaswamy Stadium",
+                    "competition": "England tour of India",
+                    "date": "2001-12-19",
+                })()
+            ],
+            False,
+            1,
+        )
+
+    monkeypatch.setattr("app.browse_matches", _fake_browse)
+
+    with app.test_client() as client:
+        response = client.get("/matches?gender=male")
+
+    assert response.status_code == 200
+    text = response.get_data(as_text=True)
+    assert "England vs India" in text
+    assert "View match summary" in text
+
+
+def test_match_detail_route_renders_info_summary(monkeypatch):
+    app = create_app()
+    app.config.update(TESTING=True)
+
+    monkeypatch.setattr("app.get_match_detail", lambda _: {"document": {"info": {}}})
+    monkeypatch.setattr(
+        "app.build_info_summary",
+        lambda match_id, _detail: type("Summary", (), {
+            "match_id": match_id,
+            "event_name": "England tour of India",
+            "match_type": "Test",
+            "gender": "male",
+            "venue": "M Chinnaswamy Stadium",
+            "city": "Bengaluru",
+            "team_a": "England",
+            "team_b": "India",
+            "start_date": "2001-12-19",
+            "end_date": "2001-12-23",
+            "outcome": "Result: draw",
+        })(),
+    )
+
+    with app.test_client() as client:
+        response = client.get("/matches/abc123")
+
+    assert response.status_code == 200
+    text = response.get_data(as_text=True)
+    assert "England tour of India" in text
+    assert "England vs India" in text
+    assert "Result: draw" in text
+
+
+def test_match_detail_route_handles_upstream_error(monkeypatch):
+    app = create_app()
+    app.config.update(TESTING=True)
+
+    from matches_api import MatchesApiError
+
+    def _raise_error(_match_id):
+        raise MatchesApiError("Provider unavailable", status_code=503)
+
+    monkeypatch.setattr("app.get_match_detail", _raise_error)
+
+    with app.test_client() as client:
+        response = client.get("/matches/abc123")
+
+    assert response.status_code == 502
+    assert "Provider unavailable" in response.get_data(as_text=True)
 
 
 # ---------------------------------------------------------------------------

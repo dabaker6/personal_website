@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-intro">
+    <p class="eyebrow">{{ page.eyebrow }}</p>
+    <h1>{{ page.headline }}</h1>
+    <p class="lead-copy">{{ page.intro }}</p>
+</section>
+
+<section class="panel-stack">
+    <form class="matches-form" method="get" action="{{ url_for('matches') }}">
+        <div class="matches-grid">
+            <label>
+                <span class="eyebrow">Gender</span>
+                <select name="gender">
+                    <option value="" {% if not query.gender %}selected{% endif %}>Any</option>
+                    <option value="male" {% if query.gender == "male" %}selected{% endif %}>male</option>
+                    <option value="female" {% if query.gender == "female" %}selected{% endif %}>female</option>
+                </select>
+            </label>
+
+            <fieldset class="date-range-fieldset">
+                <legend class="eyebrow">Date range</legend>
+                <div class="date-range-row">
+                    <label>
+                        <span>From</span>
+                        <input type="date" name="fromDate" value="{{ query.fromDate }}">
+                    </label>
+                    <label>
+                        <span>To</span>
+                        <input type="date" name="toDate" value="{{ query.toDate }}">
+                    </label>
+                </div>
+            </fieldset>
+
+            <label>
+                <span class="eyebrow">Match type</span>
+                <select name="matchType">
+                    <option value="" {% if not query.matchType %}selected{% endif %}>Any</option>
+                    <option value="Test" {% if query.matchType == "Test" %}selected{% endif %}>Test</option>
+                    <option value="ODI" {% if query.matchType == "ODI" %}selected{% endif %}>ODI</option>
+                    <option value="T20" {% if query.matchType == "T20" %}selected{% endif %}>T20</option>
+                    <option value="IT20" {% if query.matchType == "IT20" %}selected{% endif %}>IT20 (International T20)</option>
+                    <option value="ODM" {% if query.matchType == "ODM" %}selected{% endif %}>ODM (One-day match)</option>
+                    <option value="MDM" {% if query.matchType == "MDM" %}selected{% endif %}>MDM (multi-day match)</option>
+                </select>
+            </label>
+
+            <label>
+                <span class="eyebrow">Venue</span>
+                <input type="text" name="venue" value="{{ query.venue }}" placeholder="Free text for now">
+            </label>
+
+            <label>
+                <span class="eyebrow">Event name</span>
+                <input type="text" name="eventName" value="{{ query.eventName }}" placeholder="Free text for now">
+            </label>
+
+            <label>
+                <span class="eyebrow">Team</span>
+                <input type="text" name="team" value="{{ query.team }}" placeholder="Free text for now">
+            </label>
+        </div>
+
+        <div class="cta-row">
+            <button class="button-primary" type="submit">Search matches</button>
+            <a class="button-secondary" href="{{ url_for('matches') }}">Clear filters</a>
+        </div>
+    </form>
+
+    {% if error_message %}
+    <article class="fallback-card" role="status">
+        <h2>Unable to load matches</h2>
+        <p>{{ error_message }}</p>
+    </article>
+    {% elif query.has_filters() %}
+        {% if matches %}
+        <div class="section-heading">
+            <p class="eyebrow">Results</p>
+            <h2>
+                {% if total_matched is not none %}
+                {{ total_matched }} match{% if total_matched != 1 %}es{% endif %} found
+                {% else %}
+                Matches found
+                {% endif %}
+            </h2>
+            {% if has_more %}
+            <p class="lead-copy">Additional matches exist beyond the current response set.</p>
+            {% endif %}
+        </div>
+
+        <div class="card-grid">
+            {% for item in matches %}
+            <article class="info-card tall-card">
+                <p class="eyebrow">{{ item.date }}</p>
+                <h2>{{ item.teams|join(' vs ') }}</h2>
+                <p>{{ item.competition }}</p>
+                <p>{{ item.venue }}</p>
+                <div class="cta-row">
+                    <a
+                        class="button-secondary"
+                        href="{{ url_for('match_detail', match_id=item.match_id, gender=query.gender, fromDate=query.fromDate, toDate=query.toDate, venue=query.venue, matchType=query.matchType, eventName=query.eventName, team=query.team) }}"
+                    >
+                        View match summary
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <article class="fallback-card">
+            <h2>No matches found</h2>
+            <p>Try broadening the filters or clearing one of the free-text fields.</p>
+        </article>
+        {% endif %}
+    {% endif %}
+</section>
+{% endblock %}

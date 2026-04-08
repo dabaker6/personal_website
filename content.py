@@ -20,6 +20,7 @@ SITE_CONTENT: dict[str, Any] = {
         {"label": "About", "endpoint": "about", "slug": "about"},
         {"label": "Contact", "endpoint": "contact", "slug": "contact"},
         {"label": "Updates", "endpoint": "updates", "slug": "updates"},
+        {"label": "Matches", "endpoint": "matches", "slug": "matches"},
     ],
     "pages": {
         "home": {
@@ -49,6 +50,10 @@ SITE_CONTENT: dict[str, Any] = {
                 {
                     "title": "Extensible structure",
                     "body": "Shared layout, central content, and stable routes make future expansion predictable instead of disruptive.",
+                },
+                {
+                    "title": "Backend search flow",
+                    "body": "A Flask-rendered matches experience now connects to a browse API and detail endpoint without relying on client-side app code.",
                 },
             ],
             "feature_panels": [

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-intro">
+    <p class="eyebrow">Match summary</p>
+    <h1>{{ match_id }}</h1>
+    <p class="lead-copy">Brief detail extracted from the info section of the selected match document.</p>
+</section>
+
+<section class="panel-stack">
+    {% if error_message %}
+    <article class="fallback-card" role="status">
+        <h2>Summary unavailable</h2>
+        <p>{{ error_message }}</p>
+    </article>
+    {% elif summary %}
+    <article class="info-card tall-card match-summary-card">
+        <ul class="match-meta-list">
+            <li><strong>Event:</strong> {{ summary.event_name or "Unknown" }}</li>
+            <li><strong>Type:</strong> {{ summary.match_type or "Unknown" }}</li>
+            <li><strong>Gender:</strong> {{ summary.gender or "Unknown" }}</li>
+            <li><strong>Teams:</strong> {{ summary.team_a }}{% if summary.team_b %} vs {{ summary.team_b }}{% endif %}</li>
+            <li><strong>Venue:</strong> {{ summary.venue or "Unknown" }}{% if summary.city %}, {{ summary.city }}{% endif %}</li>
+            <li><strong>Date:</strong> {{ format_date_range(summary.start_date, summary.end_date) or "Unknown" }}</li>
+            {% if summary.outcome %}
+            <li><strong>Outcome:</strong> {{ summary.outcome }}</li>
+            {% endif %}
+        </ul>
+
+        <div class="cta-row">
+            <a class="button-secondary" href="{{ back_url }}">Back to search results</a>
+        </div>
+    </article>
+    {% endif %}
+</section>
+{% endblock %}
