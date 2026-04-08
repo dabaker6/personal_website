@@ -12,6 +12,7 @@ from content import get_page, get_site_content
 from matches_api import (
     BrowseQuery,
     MatchesApiError,
+    build_scorecard_preview,
     browse_matches,
     build_info_summary,
     format_date_range,
@@ -134,6 +135,7 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
         try:
             detail = get_match_detail(match_id)
             summary = build_info_summary(match_id, detail)
+            scorecard = build_scorecard_preview(detail)
         except MatchesApiError as exc:
             return render_template(
                 "match_detail.html",
@@ -144,6 +146,7 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
                 page_name="matches",
                 match_id=match_id,
                 summary=None,
+                scorecard=[],
                 error_message=str(exc),
                 query=query,
                 format_date_range=format_date_range,
@@ -158,6 +161,7 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
             page_name="matches",
             match_id=match_id,
             summary=summary,
+            scorecard=scorecard,
             error_message=None,
             query=query,
             format_date_range=format_date_range,

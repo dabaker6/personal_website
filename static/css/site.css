@@ -695,6 +695,80 @@ a {
     gap: 1rem;
 }
 
+.scorecard-stack {
+    display: grid;
+    gap: 1rem;
+}
+
+.scorecard-card {
+    display: grid;
+    gap: 0.8rem;
+}
+
+.scorecard-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.scorecard-head h3 {
+    margin: 0;
+}
+
+.score-pill {
+    margin: 0;
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid rgba(12, 91, 99, 0.22);
+    background: rgba(12, 91, 99, 0.08);
+    color: var(--support);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.78rem;
+}
+
+.score-table-wrap {
+    overflow-x: auto;
+}
+
+.score-table {
+    width: 100%;
+    min-width: 38rem;
+    border-collapse: collapse;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.45);
+}
+
+.score-table th,
+.score-table td {
+    padding: 0.55rem 0.6rem;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.94rem;
+}
+
+.score-table thead th {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--support);
+    background: rgba(12, 91, 99, 0.06);
+}
+
+.score-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.score-meta {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
 .match-meta-list {
     margin: 0;
     padding: 0;

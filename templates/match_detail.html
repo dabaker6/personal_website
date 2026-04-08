@@ -31,6 +31,103 @@
             <a class="button-secondary" href="{{ back_url }}">Back to search results</a>
         </div>
     </article>
+
+    <section class="scorecard-stack" aria-label="Match scorecard">
+        <div class="section-heading">
+            <p class="eyebrow">Scorecard</p>
+            <h2>Innings and key figures</h2>
+            <p class="lead-copy">Sketch view of a cricket scorecard with batting, bowling, extras, and fall of wickets.</p>
+        </div>
+
+        {% if scorecard %}
+            {% for innings in scorecard %}
+            <article class="info-card scorecard-card">
+                <div class="scorecard-head">
+                    <h3>{{ innings.title }}</h3>
+                    <p class="score-pill">{{ innings.total }}/{{ innings.wickets }} in {{ innings.overs }} overs · RR {{ innings.run_rate }}</p>
+                </div>
+
+                <h4 class="eyebrow">Batting</h4>
+                <div class="score-table-wrap">
+                    <table class="score-table">
+                        <thead>
+                            <tr>
+                                <th>Batter</th>
+                                <th>How out</th>
+                                <th>R</th>
+                                <th>B</th>
+                                <th>4s</th>
+                                <th>6s</th>
+                                <th>SR</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in innings.batting %}
+                            <tr>
+                                <td>{{ row.name }}</td>
+                                <td>{{ row.dismissal }}</td>
+                                <td>{{ row.runs }}</td>
+                                <td>{{ row.balls }}</td>
+                                <td>{{ row.fours }}</td>
+                                <td>{{ row.sixes }}</td>
+                                <td>{{ row.sr }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4 class="eyebrow">Bowling</h4>
+                <div class="score-table-wrap">
+                    <table class="score-table">
+                        <thead>
+                            <tr>
+                                <th>Bowler</th>
+                                <th>O</th>
+                                <th>M</th>
+                                <th>R</th>
+                                <th>W</th>
+                                <th>Econ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in innings.bowling %}
+                            <tr>
+                                <td>{{ row.name }}</td>
+                                <td>{{ row.overs }}</td>
+                                <td>{{ row.maidens }}</td>
+                                <td>{{ row.runs }}</td>
+                                <td>{{ row.wickets }}</td>
+                                <td>{{ row.econ }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="score-meta">
+                    <strong>Extras:</strong>
+                    {{ innings.extras.total }}
+                    (b {{ innings.extras.breakdown.b }}, lb {{ innings.extras.breakdown.lb }}, w {{ innings.extras.breakdown.w }}, nb {{ innings.extras.breakdown.nb }}, p {{ innings.extras.breakdown.p }})
+                </p>
+
+                <div class="score-meta">
+                    <strong>Fall of wickets:</strong>
+                    {% if innings.fall_of_wickets %}
+                        {{ innings.fall_of_wickets|join(', ') }}
+                    {% else %}
+                        No wickets recorded.
+                    {% endif %}
+                </div>
+            </article>
+            {% endfor %}
+        {% else %}
+        <article class="fallback-card">
+            <h3>Scorecard data not available</h3>
+            <p>This match detail response does not include innings data to render a scorecard yet.</p>
+        </article>
+        {% endif %}
+    </section>
     {% endif %}
 </section>
 {% endblock %}

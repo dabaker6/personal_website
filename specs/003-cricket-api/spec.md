@@ -39,6 +39,7 @@ As a site visitor, I want to select a match from the results list and see a conc
 1. **Given** search results are displayed, **When** a visitor selects one match, **Then** they are taken to a dedicated detail page for that match.
 2. **Given** the detail page loads successfully, **When** the page renders, **Then** it shows a brief summary including event name, match type, gender, teams, venue, date range, and outcome where available.
 3. **Given** a visitor wants to continue browsing, **When** they are on the match detail page, **Then** a clear path back to the search results is available.
+4. **Given** innings data is present in the match detail document, **When** the detail page renders, **Then** it also presents a scorecard-style section showing innings totals, batting rows, bowling rows, extras, and fall-of-wickets information.
 
 ---
 
@@ -88,6 +89,12 @@ As a site visitor, I want the site to fail clearly when the backend API is unava
 - **FR-015**: The detail page MUST display a clear error state when the match detail request fails.
 - **FR-016**: The system SHOULD preserve the active search filters when a visitor navigates from browse results to match detail and back again.
 - **FR-017**: The feature SHOULD remain structurally ready for future API-driven option lists for `venue`, `eventName`, and `team`.
+- **FR-018**: The match detail page MUST include a scorecard section when innings data is available.
+- **FR-019**: Each innings scorecard section MUST display total score, wickets, overs, and run rate.
+- **FR-020**: Each innings scorecard section MUST include a batting table with batter name, dismissal, runs, balls, fours, sixes, and strike rate.
+- **FR-021**: Each innings scorecard section MUST include a bowling table with bowler name, overs, maidens, runs, wickets, and economy.
+- **FR-022**: Each innings scorecard section MUST include extras total with breakdown (`b`, `lb`, `w`, `nb`, `p`) and fall-of-wickets summary when available.
+- **FR-023**: If innings data is missing from the detail document, the detail page MUST render a clear scorecard-unavailable state rather than failing.
 
 ### Key Entities
 
@@ -96,6 +103,7 @@ As a site visitor, I want the site to fail clearly when the backend API is unava
 - **Match Detail Document**: The full backend response returned for a selected match identifier.
 - **Match Info Summary**: A presentation-focused subset of the detail document derived from the `info` section for display on the detail page.
 - **Matches Page**: The server-rendered page containing the browse form, result list, no-results state, and browse-level error state.
+- **Scorecard Innings Preview**: A presentation-focused innings-level summary derived from delivery data, including innings totals, batting rows, bowling rows, extras, and fall of wickets.
 
 ## Success Criteria *(mandatory)*
 
