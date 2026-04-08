@@ -6,14 +6,13 @@ from typing import Any
 
 SITE_CONTENT: dict[str, Any] = {
     "site": {
-        "name": "Avery Stone",
+        "name": "David Baker",
         "role": "Product-minded engineer",
-        "tagline": "Server-rendered presence with a sharp visual edge.",
+        "tagline": "Built with GitHub spec kit and flask",
         "description": (
-            "I design and build clear digital experiences, pairing strong visuals "
-            "with dependable engineering decisions."
+            "An experienced full stack developer with a passion for clean design and reliable systems. "
         ),
-        "location": "Available remotely",
+        "location": "",
         "year": 2026,
     },
     "navigation": [
@@ -78,11 +77,11 @@ SITE_CONTENT: dict[str, Any] = {
             "sections": [
                 {
                     "title": "Background",
-                    "body": "I gravitate toward projects where design quality and engineering clarity are both first-class concerns.",
+                    "body": "A skilled full stack developer with experience in startups and established companies, focused on building clean, user-friendly products that scale.",
                 },
                 {
                     "title": "Working style",
-                    "body": "I prefer small, durable foundations: clear routes, reusable templates, central content, and room for sensible growth.",
+                    "body": "Always looking for innovative solutions, but careful to choose the simplest one that gets the job done. I value clear communication and thoughtful design in both code and user experience.",
                 },
                 {
                     "title": "What this site demonstrates",
@@ -94,7 +93,7 @@ SITE_CONTENT: dict[str, Any] = {
             "title": "Contact",
             "meta_description": "Simple public contact options with room for future integrations.",
             "eyebrow": "Contact",
-            "headline": "Simple public contact, no workflow overhead.",
+            "headline": "Contact Information",
             "intro": (
                 "The first release keeps contact straightforward: public channels only. "
                 "If richer workflows arrive later, they can fit into the same structure "
@@ -110,20 +109,20 @@ SITE_CONTENT: dict[str, Any] = {
     "contact_methods": [
         {
             "label": "Email",
-            "value": "hello@averystone.dev",
-            "href": "mailto:hello@averystone.dev",
+            "value": "d.a.baker246@gmail.com",
+            "href": "mailto:d.a.baker246@gmail.com",
             "note": "Best for project conversations and introductions.",
         },
         {
             "label": "GitHub",
-            "value": "github.com/averystone",
-            "href": "https://github.com/averystone",
+            "value": "github.com/dabaker6",
+            "href": "https://github.com/dabaker6",
             "note": "Selected code and experiments.",
         },
         {
             "label": "LinkedIn",
-            "value": "linkedin.com/in/averystone",
-            "href": "https://www.linkedin.com/in/averystone",
+            "value": "linkedin.com/in/dabaker246",
+            "href": "https://uk.linkedin.com/in/dabaker246",
             "note": "Professional profile and updates.",
         },
     ],
