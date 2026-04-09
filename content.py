@@ -17,10 +17,11 @@ SITE_CONTENT: dict[str, Any] = {
     },
     "navigation": [
         {"label": "Home", "endpoint": "home", "slug": "home"},
+        {"label": "Cricket Data", "endpoint": "matches", "slug": "matches"},
         {"label": "About", "endpoint": "about", "slug": "about"},
-        {"label": "Contact", "endpoint": "contact", "slug": "contact"},
+        {"label": "Contact", "endpoint": "contact", "slug": "contact"},        
         {"label": "Updates", "endpoint": "updates", "slug": "updates"},
-        {"label": "Matches", "endpoint": "matches", "slug": "matches"},
+        
     ],
     "pages": {
         "home": {

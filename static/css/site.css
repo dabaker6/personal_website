@@ -700,6 +700,48 @@ a {
     gap: 1rem;
 }
 
+.scorecard-tabs {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.scorecard-tabs-nav {
+    display: flex;
+    gap: 0.55rem;
+    overflow-x: auto;
+    padding-bottom: 0.2rem;
+    scrollbar-width: thin;
+}
+
+.scorecard-tab {
+    flex: 0 0 auto;
+    min-height: 2.4rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid rgba(24, 22, 26, 0.18);
+    background: rgba(255, 255, 255, 0.58);
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.03em;
+    transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+.scorecard-tab:hover,
+.scorecard-tab:focus-visible {
+    color: var(--text);
+    border-color: rgba(24, 22, 26, 0.3);
+    background: rgba(24, 22, 26, 0.08);
+}
+
+.scorecard-tab.is-active {
+    color: #fff;
+    border-color: transparent;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+}
+
 .scorecard-card {
     display: grid;
     gap: 0.8rem;
@@ -849,5 +891,19 @@ a {
     .page-intro,
     .site-footer {
         padding: 1.1rem;
+    }
+
+    .scorecard-tabs-nav {
+        margin: 0 -0.2rem;
+        padding: 0 0.2rem 0.2rem;
+    }
+
+    .scorecard-tab {
+        font-size: 0.73rem;
+        padding: 0.42rem 0.62rem;
+    }
+
+    .score-table {
+        min-width: 31rem;
     }
 }

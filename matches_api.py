@@ -357,6 +357,8 @@ def build_scorecard_preview(detail: dict[str, Any]) -> list[dict[str, Any]]:
         extras_total = sum(extras.values())
         scorecard.append(
             {
+                "team": team,
+                "innings_number": idx,
                 "title": f"{team} innings",
                 "total": innings_total,
                 "wickets": wickets_lost,

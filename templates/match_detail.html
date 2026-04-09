@@ -39,8 +39,31 @@
         </div>
 
         {% if scorecard %}
+            <div class="scorecard-tabs" data-scorecard-tabs>
+                <div class="scorecard-tabs-nav" role="tablist" aria-label="Innings selector">
+                    {% for innings in scorecard %}
+                    <button
+                        type="button"
+                        class="scorecard-tab{% if loop.first %} is-active{% endif %}"
+                        role="tab"
+                        id="innings-tab-{{ loop.index }}"
+                        aria-controls="innings-panel-{{ loop.index }}"
+                        aria-selected="{{ 'true' if loop.first else 'false' }}"
+                        tabindex="{{ '0' if loop.first else '-1' }}"
+                    >
+                        {{ innings.team }} · Innings {{ innings.innings_number }}
+                    </button>
+                    {% endfor %}
+                </div>
+
             {% for innings in scorecard %}
-            <article class="info-card scorecard-card">
+            <article
+                class="info-card scorecard-card"
+                role="tabpanel"
+                id="innings-panel-{{ loop.index }}"
+                aria-labelledby="innings-tab-{{ loop.index }}"
+                {% if not loop.first %}hidden{% endif %}
+            >
                 <div class="scorecard-head">
                     <h3>{{ innings.title }}</h3>
                     <p class="score-pill">{{ innings.total }}/{{ innings.wickets }} in {{ innings.overs }} overs · RR {{ innings.run_rate }}</p>
@@ -120,6 +143,7 @@
                 </div>
             </article>
             {% endfor %}
+            </div>
         {% else %}
         <article class="fallback-card">
             <h3>Scorecard data not available</h3>
@@ -129,4 +153,5 @@
     </section>
     {% endif %}
 </section>
+<script src="{{ url_for('static', filename='js/match_detail.js') }}"></script>
 {% endblock %}
