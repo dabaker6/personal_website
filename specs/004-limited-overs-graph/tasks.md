@@ -16,7 +16,7 @@
 **Purpose**: Confirm the current implementation surface and create the feature task artifact.
 
 - [X] T001 Review existing match-detail rendering and scorecard shaping in `app.py`, `matches_api.py`, and `templates/match_detail.html`
-- [ ] T002 Review current match-detail interactions and styling in `static/js/match_detail.js` and `static/css/site.css`
+- [X] T002 Review current match-detail interactions and styling in `static/js/match_detail.js` and `static/css/site.css`
 
 ---
 
