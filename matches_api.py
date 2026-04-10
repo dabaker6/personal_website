@@ -18,6 +18,8 @@ BROWSE_QUERY_FIELDS = (
     "team",
 )
 
+LIMITED_OVERS_MATCH_TYPES = {"ODI", "T20", "IT20", "ODM"}
+
 
 class MatchesApiError(RuntimeError):
     """Raised when the upstream matches API cannot satisfy a request."""
@@ -71,6 +73,47 @@ class MatchInfoSummary:
     start_date: str
     end_date: str
     outcome: str
+
+
+def normalize_match_type(match_type: str) -> str:
+    return str(match_type or "").strip().upper()
+
+
+def is_limited_overs_match_type(match_type: str) -> bool:
+    return normalize_match_type(match_type) in LIMITED_OVERS_MATCH_TYPES
+
+
+def get_detail_match_type(detail: dict[str, Any]) -> str:
+    document = detail.get("document", {}) if isinstance(detail, dict) else {}
+    info = document.get("info", {}) if isinstance(document, dict) else {}
+    return str(info.get("match_type", ""))
+
+
+def is_limited_overs_match_detail(detail: dict[str, Any]) -> bool:
+    return is_limited_overs_match_type(get_detail_match_type(detail))
+
+
+def has_graph_source_data(detail: dict[str, Any]) -> bool:
+    document = detail.get("document", {}) if isinstance(detail, dict) else {}
+    innings_data = document.get("innings", []) if isinstance(document, dict) else []
+    if not isinstance(innings_data, list) or not innings_data:
+        return False
+
+    for innings in innings_data:
+        if not isinstance(innings, dict):
+            continue
+        overs = innings.get("overs", [])
+        if isinstance(overs, list) and overs:
+            return True
+    return False
+
+
+def get_graph_availability(detail: dict[str, Any]) -> str:
+    if not is_limited_overs_match_detail(detail):
+        return "not_applicable"
+    if has_graph_source_data(detail):
+        return "available"
+    return "unavailable"
 
 
 def _api_base_url() -> str:    
