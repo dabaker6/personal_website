@@ -7,14 +7,18 @@
 
         try {
             const parsed = JSON.parse(payloadNode.textContent || "{}");
-            if (!parsed || typeof parsed !== "object") {
-                return null;
-            }
-            return parsed;
+            return parsed && typeof parsed === "object" ? parsed : null;
         } catch {
             return null;
         }
     };
+
+    const escapeHtml = (value) => String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
 
     const renderProgressionChart = () => {
         const section = document.querySelector("[data-progression-chart-section]");
@@ -27,8 +31,12 @@
             return;
         }
 
+        const tooltip = section.querySelector("[data-progression-tooltip]");
+        const wicketLayer = section.querySelector("[data-progression-wickets]");
+
         const payload = parseChartPayload(section);
         const series = Array.isArray(payload?.series) ? payload.series : [];
+        const wickets = Array.isArray(payload?.wickets) ? payload.wickets : [];
         if (series.length === 0) {
             return;
         }
@@ -61,22 +69,22 @@
         const overTicks = Math.min(maxOver, 10);
 
         let svg = "";
-        svg += `<svg viewBox=\"0 0 ${width} ${height}\" role=\"img\" aria-label=\"Innings progression line chart\">`;
-        svg += `<line x1=\"${margin.left}\" y1=\"${height - margin.bottom}\" x2=\"${width - margin.right}\" y2=\"${height - margin.bottom}\" stroke=\"rgba(24,22,26,0.35)\" />`;
-        svg += `<line x1=\"${margin.left}\" y1=\"${margin.top}\" x2=\"${margin.left}\" y2=\"${height - margin.bottom}\" stroke=\"rgba(24,22,26,0.35)\" />`;
+        svg += `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Innings progression line chart">`;
+        svg += `<line x1="${margin.left}" y1="${height - margin.bottom}" x2="${width - margin.right}" y2="${height - margin.bottom}" stroke="rgba(24,22,26,0.35)" />`;
+        svg += `<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${height - margin.bottom}" stroke="rgba(24,22,26,0.35)" />`;
 
         for (let i = 0; i <= runTicks; i += 1) {
             const runs = Math.round((maxRuns / runTicks) * i);
             const y = yForRuns(runs);
-            svg += `<line x1=\"${margin.left}\" y1=\"${y}\" x2=\"${width - margin.right}\" y2=\"${y}\" stroke=\"rgba(24,22,26,0.08)\" />`;
-            svg += `<text x=\"${margin.left - 10}\" y=\"${y + 4}\" text-anchor=\"end\" font-size=\"11\" fill=\"#5d5960\">${runs}</text>`;
+            svg += `<line x1="${margin.left}" y1="${y}" x2="${width - margin.right}" y2="${y}" stroke="rgba(24,22,26,0.08)" />`;
+            svg += `<text x="${margin.left - 10}" y="${y + 4}" text-anchor="end" font-size="11" fill="#5d5960">${runs}</text>`;
         }
 
         for (let i = 0; i <= overTicks; i += 1) {
             const over = Math.max(1, Math.round((maxOver / overTicks) * i));
             const x = xForOver(over);
-            svg += `<line x1=\"${x}\" y1=\"${margin.top}\" x2=\"${x}\" y2=\"${height - margin.bottom}\" stroke=\"rgba(24,22,26,0.06)\" />`;
-            svg += `<text x=\"${x}\" y=\"${height - margin.bottom + 18}\" text-anchor=\"middle\" font-size=\"11\" fill=\"#5d5960\">${over}</text>`;
+            svg += `<line x1="${x}" y1="${margin.top}" x2="${x}" y2="${height - margin.bottom}" stroke="rgba(24,22,26,0.06)" />`;
+            svg += `<text x="${x}" y="${height - margin.bottom + 18}" text-anchor="middle" font-size="11" fill="#5d5960">${over}</text>`;
         }
 
         series.forEach((innings, idx) => {
@@ -94,7 +102,7 @@
                 })
                 .join(" ");
 
-            svg += `<path d=\"${pathData}\" fill=\"none\" stroke=\"${color}\" stroke-width=\"2.5\" />`;
+            svg += `<path d="${pathData}" fill="none" stroke="${color}" stroke-width="2.5" />`;
 
             points.forEach((point) => {
                 const x = xForOver(point.over);
@@ -102,15 +110,91 @@
                 const team = String(innings.team || `Innings ${innings.innings_number || idx + 1}`);
                 const over = Number(point.over) || 0;
                 const runs = Number(point.cumulative_runs) || 0;
-                svg += `<circle cx=\"${x}\" cy=\"${y}\" r=\"3\" fill=\"${color}\"><title>${team}: Over ${over}, ${runs} runs</title></circle>`;
+                svg += `<circle cx="${x}" cy="${y}" r="3" fill="${color}"><title>${team}: Over ${over}, ${runs} runs</title></circle>`;
             });
         });
 
-        svg += `<text x=\"${width / 2}\" y=\"${height - 8}\" text-anchor=\"middle\" font-size=\"12\" fill=\"#5d5960\">Overs</text>`;
-        svg += `<text x=\"16\" y=\"${height / 2}\" text-anchor=\"middle\" font-size=\"12\" fill=\"#5d5960\" transform=\"rotate(-90 16 ${height / 2})\">Cumulative runs</text>`;
+        wickets.forEach((wicket) => {
+            const over = Number(wicket.over) || 1;
+            const runs = Number(wicket.cumulative_runs) || 0;
+            const stackIndex = Math.max(1, Number(wicket.index_in_over) || 1);
+            const x = xForOver(over) + (stackIndex - 1) * 7;
+            const y = yForRuns(runs) - 8 - (stackIndex - 1) * 9;
+
+            const team = escapeHtml(String(wicket.team || "Innings"));
+            const batter = escapeHtml(String(wicket.batter || "Unknown batter"));
+            const bowler = escapeHtml(String(wicket.bowler || "Unknown bowler"));
+            const dismissalMethod = escapeHtml(String(wicket.dismissal_method || wicket.dismissal || "wicket"));
+
+            svg += `<circle class="progression-wicket-marker" data-wicket-marker data-team="${team}" data-over="${over}" data-runs="${runs}" data-batter="${batter}" data-bowler="${bowler}" data-dismissal="${dismissalMethod}" cx="${x}" cy="${y}" r="4" fill="#111" stroke="#fff" stroke-width="1.2" tabindex="0" role="button" aria-label="Wicket: ${team} over ${over}, ${batter} ${dismissalMethod}"></circle>`;
+        });
+
+        svg += `<text x="${width / 2}" y="${height - 8}" text-anchor="middle" font-size="12" fill="#5d5960">Overs</text>`;
+        svg += `<text x="16" y="${height / 2}" text-anchor="middle" font-size="12" fill="#5d5960" transform="rotate(-90 16 ${height / 2})">Cumulative runs</text>`;
         svg += "</svg>";
 
         chartHost.innerHTML = svg;
+
+        if (wicketLayer instanceof HTMLElement) {
+            if (wickets.length > 0) {
+                wicketLayer.hidden = false;
+                wicketLayer.textContent = `${wickets.length} wicket marker${wickets.length === 1 ? "" : "s"} plotted.`;
+            } else {
+                wicketLayer.hidden = true;
+                wicketLayer.textContent = "";
+            }
+        }
+
+        if (!(tooltip instanceof HTMLElement)) {
+            return;
+        }
+
+        const markers = Array.from(chartHost.querySelectorAll("[data-wicket-marker]"));
+        if (markers.length === 0) {
+            tooltip.hidden = true;
+            return;
+        }
+
+        const hideTooltip = () => {
+            tooltip.hidden = true;
+            tooltip.textContent = "";
+        };
+
+        const showTooltip = (target) => {
+            if (!(target instanceof SVGElement)) {
+                return;
+            }
+
+            const team = target.getAttribute("data-team") || "Innings";
+            const over = target.getAttribute("data-over") || "-";
+            const runs = target.getAttribute("data-runs") || "-";
+            const batter = target.getAttribute("data-batter") || "Unknown batter";
+            const bowler = target.getAttribute("data-bowler") || "Unknown bowler";
+            const dismissal = target.getAttribute("data-dismissal") || "wicket";
+
+            tooltip.innerHTML = `<strong>${team}</strong><br>Over ${over} (${runs})<br>${batter} • ${dismissal}<br>Bowler: ${bowler}`;
+            tooltip.hidden = false;
+
+            const chartRect = chartHost.getBoundingClientRect();
+            const markerRect = target.getBoundingClientRect();
+            const offsetLeft = markerRect.left - chartRect.left + chartHost.scrollLeft;
+            const offsetTop = markerRect.top - chartRect.top;
+            tooltip.style.position = "absolute";
+            tooltip.style.left = `${Math.max(8, offsetLeft + 10)}px`;
+            tooltip.style.top = `${Math.max(8, offsetTop - 52)}px`;
+        };
+
+        markers.forEach((marker) => {
+            marker.addEventListener("mouseenter", (event) => showTooltip(event.currentTarget));
+            marker.addEventListener("focus", (event) => showTooltip(event.currentTarget));
+            marker.addEventListener("mouseleave", hideTooltip);
+            marker.addEventListener("blur", hideTooltip);
+            marker.addEventListener("keydown", (event) => {
+                if (event.key === "Escape") {
+                    hideTooltip();
+                }
+            });
+        });
     };
 
     const containers = Array.from(document.querySelectorAll("[data-scorecard-tabs]"));
@@ -148,6 +232,7 @@
             if (!(target instanceof HTMLButtonElement) || target.getAttribute("role") !== "tab") {
                 return;
             }
+
             const index = tabs.indexOf(target);
             if (index >= 0) {
                 activateTab(tabs, panels, index);
