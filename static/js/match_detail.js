@@ -1,6 +1,121 @@
 (() => {
+    const parseChartPayload = (container) => {
+        const payloadNode = container.querySelector("[data-progression-chart-payload]");
+        if (!(payloadNode instanceof HTMLScriptElement)) {
+            return null;
+        }
+
+        try {
+            const parsed = JSON.parse(payloadNode.textContent || "{}");
+            if (!parsed || typeof parsed !== "object") {
+                return null;
+            }
+            return parsed;
+        } catch {
+            return null;
+        }
+    };
+
+    const renderProgressionChart = () => {
+        const section = document.querySelector("[data-progression-chart-section]");
+        if (!(section instanceof HTMLElement)) {
+            return;
+        }
+
+        const chartHost = section.querySelector("[data-progression-chart]");
+        if (!(chartHost instanceof HTMLElement)) {
+            return;
+        }
+
+        const payload = parseChartPayload(section);
+        const series = Array.isArray(payload?.series) ? payload.series : [];
+        if (series.length === 0) {
+            return;
+        }
+
+        const allPoints = series.flatMap((innings) => (Array.isArray(innings.points) ? innings.points : []));
+        const maxOver = Math.max(1, ...allPoints.map((point) => Number(point.over) || 0));
+        const maxRuns = Math.max(1, ...allPoints.map((point) => Number(point.cumulative_runs) || 0));
+
+        const width = 820;
+        const height = 380;
+        const margin = { top: 16, right: 16, bottom: 44, left: 52 };
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+
+        const xForOver = (over) => {
+            if (maxOver <= 1) {
+                return margin.left;
+            }
+            const clamped = Math.max(1, Math.min(maxOver, Number(over) || 1));
+            return margin.left + ((clamped - 1) / (maxOver - 1)) * innerWidth;
+        };
+
+        const yForRuns = (runs) => {
+            const clamped = Math.max(0, Math.min(maxRuns, Number(runs) || 0));
+            return margin.top + (1 - clamped / maxRuns) * innerHeight;
+        };
+
+        const colors = ["#c4572b", "#0c5b63", "#8c3218", "#176f7a"];
+        const runTicks = 4;
+        const overTicks = Math.min(maxOver, 10);
+
+        let svg = "";
+        svg += `<svg viewBox=\"0 0 ${width} ${height}\" role=\"img\" aria-label=\"Innings progression line chart\">`;
+        svg += `<line x1=\"${margin.left}\" y1=\"${height - margin.bottom}\" x2=\"${width - margin.right}\" y2=\"${height - margin.bottom}\" stroke=\"rgba(24,22,26,0.35)\" />`;
+        svg += `<line x1=\"${margin.left}\" y1=\"${margin.top}\" x2=\"${margin.left}\" y2=\"${height - margin.bottom}\" stroke=\"rgba(24,22,26,0.35)\" />`;
+
+        for (let i = 0; i <= runTicks; i += 1) {
+            const runs = Math.round((maxRuns / runTicks) * i);
+            const y = yForRuns(runs);
+            svg += `<line x1=\"${margin.left}\" y1=\"${y}\" x2=\"${width - margin.right}\" y2=\"${y}\" stroke=\"rgba(24,22,26,0.08)\" />`;
+            svg += `<text x=\"${margin.left - 10}\" y=\"${y + 4}\" text-anchor=\"end\" font-size=\"11\" fill=\"#5d5960\">${runs}</text>`;
+        }
+
+        for (let i = 0; i <= overTicks; i += 1) {
+            const over = Math.max(1, Math.round((maxOver / overTicks) * i));
+            const x = xForOver(over);
+            svg += `<line x1=\"${x}\" y1=\"${margin.top}\" x2=\"${x}\" y2=\"${height - margin.bottom}\" stroke=\"rgba(24,22,26,0.06)\" />`;
+            svg += `<text x=\"${x}\" y=\"${height - margin.bottom + 18}\" text-anchor=\"middle\" font-size=\"11\" fill=\"#5d5960\">${over}</text>`;
+        }
+
+        series.forEach((innings, idx) => {
+            const points = Array.isArray(innings.points) ? innings.points : [];
+            if (points.length === 0) {
+                return;
+            }
+
+            const color = colors[idx % colors.length];
+            const pathData = points
+                .map((point, pointIndex) => {
+                    const x = xForOver(point.over);
+                    const y = yForRuns(point.cumulative_runs);
+                    return `${pointIndex === 0 ? "M" : "L"}${x},${y}`;
+                })
+                .join(" ");
+
+            svg += `<path d=\"${pathData}\" fill=\"none\" stroke=\"${color}\" stroke-width=\"2.5\" />`;
+
+            points.forEach((point) => {
+                const x = xForOver(point.over);
+                const y = yForRuns(point.cumulative_runs);
+                const team = String(innings.team || `Innings ${innings.innings_number || idx + 1}`);
+                const over = Number(point.over) || 0;
+                const runs = Number(point.cumulative_runs) || 0;
+                svg += `<circle cx=\"${x}\" cy=\"${y}\" r=\"3\" fill=\"${color}\"><title>${team}: Over ${over}, ${runs} runs</title></circle>`;
+            });
+        });
+
+        svg += `<text x=\"${width / 2}\" y=\"${height - 8}\" text-anchor=\"middle\" font-size=\"12\" fill=\"#5d5960\">Overs</text>`;
+        svg += `<text x=\"16\" y=\"${height / 2}\" text-anchor=\"middle\" font-size=\"12\" fill=\"#5d5960\" transform=\"rotate(-90 16 ${height / 2})\">Cumulative runs</text>`;
+        svg += "</svg>";
+
+        chartHost.innerHTML = svg;
+    };
+
     const containers = Array.from(document.querySelectorAll("[data-scorecard-tabs]"));
     if (containers.length === 0) {
+        renderProgressionChart();
         return;
     }
 
@@ -67,4 +182,6 @@
             activateTab(tabs, panels, nextIndex);
         });
     });
+
+    renderProgressionChart();
 })();
