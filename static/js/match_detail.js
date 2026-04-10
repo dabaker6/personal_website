@@ -125,7 +125,7 @@
             const runs = Number(wicket.cumulative_runs) || 0;
             const stackIndex = Math.max(1, Number(wicket.index_in_over) || 1);
             const x = xForOver(over) + (stackIndex - 1) * 7;
-            const y = yForRuns(runs) - 8 - (stackIndex - 1) * 9;
+            const y = yForRuns(runs) - (stackIndex - 1);
 
             const team = escapeHtml(String(wicket.team || "Innings"));
             const batter = escapeHtml(String(wicket.batter || "Unknown batter"));
