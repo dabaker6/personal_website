@@ -252,12 +252,44 @@ def _resolve_over_index(over: dict[str, Any], fallback_index: int) -> int:
     return value if value >= 0 else fallback_index
 
 
+def build_cumulative_runs_by_over(innings: dict[str, Any]) -> list[dict[str, Any]]:
+    overs = innings.get("overs", []) if isinstance(innings.get("overs", []), list) else []
+    cumulative_runs = 0
+    points: list[dict[str, Any]] = []
+
+    for over_position, over in enumerate(overs):
+        if not isinstance(over, dict):
+            continue
+
+        over_group = _resolve_over_index(over, over_position) + 1
+        deliveries = over.get("deliveries", []) if isinstance(over.get("deliveries", []), list) else []
+        runs_in_over = 0
+
+        for delivery in deliveries:
+            if not isinstance(delivery, dict):
+                continue
+            runs = delivery.get("runs", {}) if isinstance(delivery.get("runs", {}), dict) else {}
+            total_runs = _to_int(runs.get("total"))
+            runs_in_over += total_runs
+            cumulative_runs += total_runs
+
+        points.append(
+            {
+                "over": over_group,
+                "cumulative_runs": cumulative_runs,
+                "runs_in_over": runs_in_over,
+            }
+        )
+
+    return points
+
+
 def _build_innings_graph_model(innings: dict[str, Any], innings_number: int) -> dict[str, Any]:
     team = str(innings.get("team", "")) or f"Innings {innings_number}"
     overs = innings.get("overs", []) if isinstance(innings.get("overs", []), list) else []
 
-    cumulative_runs = 0
-    points: list[dict[str, Any]] = []
+    points = build_cumulative_runs_by_over(innings)
+    cumulative_by_over = {point["over"]: point["cumulative_runs"] for point in points}
     wickets: list[dict[str, Any]] = []
 
     for over_position, over in enumerate(overs):
@@ -268,17 +300,11 @@ def _build_innings_graph_model(innings: dict[str, Any], innings_number: int) -> 
         over_group = over_index + 1
         deliveries = over.get("deliveries", []) if isinstance(over.get("deliveries", []), list) else []
 
-        over_runs = 0
         wickets_in_over = 0
 
         for delivery in deliveries:
             if not isinstance(delivery, dict):
                 continue
-
-            runs = delivery.get("runs", {}) if isinstance(delivery.get("runs", {}), dict) else {}
-            total_runs = _to_int(runs.get("total"))
-            over_runs += total_runs
-            cumulative_runs += total_runs
 
             delivery_wickets = delivery.get("wickets", []) if isinstance(delivery.get("wickets", []), list) else []
             for wicket in delivery_wickets:
@@ -291,21 +317,13 @@ def _build_innings_graph_model(innings: dict[str, Any], innings_number: int) -> 
                         "innings_number": innings_number,
                         "team": team,
                         "over": over_group,
-                        "cumulative_runs": cumulative_runs,
+                        "cumulative_runs": cumulative_by_over.get(over_group, 0),
                         "index_in_over": wickets_in_over,
                         "batter": str(wicket.get("player_out", "")),
                         "bowler": str(delivery.get("bowler", "")),
                         "dismissal": str(wicket.get("kind", "wicket")),
                     }
                 )
-
-        points.append(
-            {
-                "over": over_group,
-                "cumulative_runs": cumulative_runs,
-                "runs_in_over": over_runs,
-            }
-        )
 
     return {
         "innings_number": innings_number,
