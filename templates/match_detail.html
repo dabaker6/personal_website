@@ -164,6 +164,14 @@
                 <div class="progression-chart-viewport" aria-live="polite">
                     <div class="progression-chart" data-progression-chart></div>
                 </div>
+                <script type="application/json" data-progression-chart-payload>
+                    {{ {
+                        "availability": graph_model.availability,
+                        "isLimitedOvers": graph_model.is_limited_overs,
+                        "series": graph_model.series,
+                        "wickets": graph_model.wickets,
+                    } | tojson }}
+                </script>
             </article>
             {% elif graph_model.availability == "partial" %}
             <article class="fallback-card">
