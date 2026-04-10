@@ -61,7 +61,7 @@
 ### Implementation for User Story 2
 
 - [X] T011 [US2] Extract wicket marker payloads including batter, bowler, and dismissal method in `matches_api.py`
-- [ ] T012 [US2] Add wicket-indicator markup hooks and tooltip container support in `templates/match_detail.html`
+- [X] T012 [US2] Add wicket-indicator markup hooks and tooltip container support in `templates/match_detail.html`
 - [ ] T013 [US2] Render wicket markers and support multiple wickets in the same over in `static/js/match_detail.js`
 - [ ] T014 [P] [US2] Add tooltip and wicket-marker styling in `static/css/site.css`
 
