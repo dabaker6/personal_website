@@ -235,6 +235,112 @@ def _balls_to_overs(balls: int) -> str:
     return f"{completed}.{remainder}"
 
 
+def _get_detail_innings(detail: dict[str, Any]) -> list[dict[str, Any]]:
+    document = detail.get("document", {}) if isinstance(detail, dict) else {}
+    innings_data = document.get("innings", []) if isinstance(document, dict) else []
+    return innings_data if isinstance(innings_data, list) else []
+
+
+def _resolve_over_index(over: dict[str, Any], fallback_index: int) -> int:
+    if not isinstance(over, dict):
+        return fallback_index
+    raw = over.get("over")
+    try:
+        value = int(raw)
+    except (TypeError, ValueError):
+        return fallback_index
+    return value if value >= 0 else fallback_index
+
+
+def _build_innings_graph_model(innings: dict[str, Any], innings_number: int) -> dict[str, Any]:
+    team = str(innings.get("team", "")) or f"Innings {innings_number}"
+    overs = innings.get("overs", []) if isinstance(innings.get("overs", []), list) else []
+
+    cumulative_runs = 0
+    points: list[dict[str, Any]] = []
+    wickets: list[dict[str, Any]] = []
+
+    for over_position, over in enumerate(overs):
+        if not isinstance(over, dict):
+            continue
+
+        over_index = _resolve_over_index(over, over_position)
+        over_group = over_index + 1
+        deliveries = over.get("deliveries", []) if isinstance(over.get("deliveries", []), list) else []
+
+        over_runs = 0
+        wickets_in_over = 0
+
+        for delivery in deliveries:
+            if not isinstance(delivery, dict):
+                continue
+
+            runs = delivery.get("runs", {}) if isinstance(delivery.get("runs", {}), dict) else {}
+            total_runs = _to_int(runs.get("total"))
+            over_runs += total_runs
+            cumulative_runs += total_runs
+
+            delivery_wickets = delivery.get("wickets", []) if isinstance(delivery.get("wickets", []), list) else []
+            for wicket in delivery_wickets:
+                if not isinstance(wicket, dict):
+                    continue
+
+                wickets_in_over += 1
+                wickets.append(
+                    {
+                        "innings_number": innings_number,
+                        "team": team,
+                        "over": over_group,
+                        "cumulative_runs": cumulative_runs,
+                        "index_in_over": wickets_in_over,
+                        "batter": str(wicket.get("player_out", "")),
+                        "bowler": str(delivery.get("bowler", "")),
+                        "dismissal": str(wicket.get("kind", "wicket")),
+                    }
+                )
+
+        points.append(
+            {
+                "over": over_group,
+                "cumulative_runs": cumulative_runs,
+                "runs_in_over": over_runs,
+            }
+        )
+
+    return {
+        "innings_number": innings_number,
+        "team": team,
+        "points": points,
+        "wickets": wickets,
+    }
+
+
+def build_progression_series(detail: dict[str, Any]) -> list[dict[str, Any]]:
+    series: list[dict[str, Any]] = []
+    for idx, innings in enumerate(_get_detail_innings(detail), start=1):
+        if not isinstance(innings, dict):
+            continue
+        innings_model = _build_innings_graph_model(innings, idx)
+        series.append(
+            {
+                "innings_number": innings_model["innings_number"],
+                "team": innings_model["team"],
+                "points": innings_model["points"],
+            }
+        )
+    return series
+
+
+def build_wicket_marker_view_model(detail: dict[str, Any]) -> list[dict[str, Any]]:
+    markers: list[dict[str, Any]] = []
+    for idx, innings in enumerate(_get_detail_innings(detail), start=1):
+        if not isinstance(innings, dict):
+            continue
+        innings_model = _build_innings_graph_model(innings, idx)
+        markers.extend(innings_model["wickets"])
+    return markers
+
+
 def build_scorecard_preview(detail: dict[str, Any]) -> list[dict[str, Any]]:
     """Build a lightweight, presentation-ready scorecard preview per innings."""
     document = detail.get("document", {}) if isinstance(detail, dict) else {}
