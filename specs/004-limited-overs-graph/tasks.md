@@ -79,7 +79,7 @@
 
 - [X] T015 [US3] Implement partial-data and unavailable-data graph states in `matches_api.py`
 - [X] T016 [US3] Render non-qualifying, partial, and unavailable graph messaging in `templates/match_detail.html`
-- [ ] T017 [US3] Update client-side graph initialization to safely skip non-qualifying and unavailable states in `static/js/match_detail.js`
+- [X] T017 [US3] Update client-side graph initialization to safely skip non-qualifying and unavailable states in `static/js/match_detail.js`
 - [ ] T018 [P] [US3] Refine responsive spacing and fallback presentation for scorecard-plus-graph layouts in `static/css/site.css`
 
 **Checkpoint**: All three user stories are independently usable and the existing detail page remains stable.

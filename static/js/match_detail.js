@@ -35,6 +35,12 @@
         const wicketLayer = section.querySelector("[data-progression-wickets]");
 
         const payload = parseChartPayload(section);
+        
+        // Skip rendering if chart is not available
+        if (payload?.availability !== "available") {
+            return;
+        }
+        
         const series = Array.isArray(payload?.series) ? payload.series : [];
         const wickets = Array.isArray(payload?.wickets) ? payload.wickets : [];
         if (series.length === 0) {
