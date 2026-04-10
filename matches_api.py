@@ -321,6 +321,7 @@ def _build_innings_graph_model(innings: dict[str, Any], innings_number: int) -> 
                         "index_in_over": wickets_in_over,
                         "batter": str(wicket.get("player_out", "")),
                         "bowler": str(delivery.get("bowler", "")),
+                        "dismissal_method": str(wicket.get("kind", "wicket")),
                         "dismissal": str(wicket.get("kind", "wicket")),
                     }
                 )
