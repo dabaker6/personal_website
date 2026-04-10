@@ -150,6 +150,34 @@
             <p>This match detail response does not include innings data to render a scorecard yet.</p>
         </article>
         {% endif %}
+
+        {% if graph_model.is_limited_overs %}
+        <section class="progression-stack" aria-label="Innings progression graph">
+            <div class="section-heading">
+                <p class="eyebrow">Innings progression</p>
+                <h2>Runs by over</h2>
+                <p class="lead-copy">Cumulative runs by over for each innings in this limited-overs match.</p>
+            </div>
+
+            {% if graph_model.availability == "available" %}
+            <article class="info-card progression-card" data-progression-chart-section>
+                <div class="progression-chart-viewport" aria-live="polite">
+                    <div class="progression-chart" data-progression-chart></div>
+                </div>
+            </article>
+            {% elif graph_model.availability == "partial" %}
+            <article class="fallback-card">
+                <h3>Progression graph partially available</h3>
+                <p>Some innings data is missing, so the graph may be incomplete for this match.</p>
+            </article>
+            {% else %}
+            <article class="fallback-card">
+                <h3>Progression graph unavailable</h3>
+                <p>This limited-overs match does not include enough over-by-over data to render the graph.</p>
+            </article>
+            {% endif %}
+        </section>
+        {% endif %}
     </section>
     {% endif %}
 </section>

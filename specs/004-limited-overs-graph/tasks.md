@@ -43,7 +43,7 @@
 ### Implementation for User Story 1
 
 - [X] T006 [US1] Build cumulative runs-by-over extraction for innings data in `matches_api.py`
-- [ ] T007 [US1] Add the graph section and qualifying-match conditional rendering beneath the scorecard in `templates/match_detail.html`
+- [X] T007 [US1] Add the graph section and qualifying-match conditional rendering beneath the scorecard in `templates/match_detail.html`
 - [ ] T008 [US1] Expose serialized graph data for the page in `templates/match_detail.html`
 - [ ] T009 [US1] Render innings progression lines, axes, and over-grouped points in `static/js/match_detail.js`
 - [ ] T010 [P] [US1] Add graph layout, legend, and responsive chart styling in `static/css/site.css`
