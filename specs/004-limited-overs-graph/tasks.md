@@ -28,7 +28,7 @@
 
 - [X] T003 Define limited-overs match classification and graph availability helpers in `matches_api.py`
 - [X] T004 Define progression-series and wicket-marker view-model builders in `matches_api.py`
-- [ ] T005 Wire the graph view model into the `/matches/<match_id>` route in `app.py`
+- [X] T005 Wire the graph view model into the `/matches/<match_id>` route in `app.py`
 
 **Checkpoint**: Match detail route can supply a stable graph payload and availability state to the template.
 

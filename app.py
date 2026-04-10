@@ -12,11 +12,15 @@ from content import get_page, get_site_content
 from matches_api import (
     BrowseQuery,
     MatchesApiError,
+    build_progression_series,
     build_scorecard_preview,
+    build_wicket_marker_view_model,
     browse_matches,
     build_info_summary,
     format_date_range,
+    get_graph_availability,
     get_match_detail,
+    is_limited_overs_match_detail,
 )
 
 
@@ -131,11 +135,23 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
     @app.route("/matches/<match_id>")
     def match_detail(match_id: str) -> str:
         query = BrowseQuery.from_args(request.args.to_dict(flat=True))
+        graph_model = {
+            "availability": "unavailable",
+            "is_limited_overs": False,
+            "series": [],
+            "wickets": [],
+        }
 
         try:
             detail = get_match_detail(match_id)
             summary = build_info_summary(match_id, detail)
             scorecard = build_scorecard_preview(detail)
+            graph_model = {
+                "availability": get_graph_availability(detail),
+                "is_limited_overs": is_limited_overs_match_detail(detail),
+                "series": build_progression_series(detail),
+                "wickets": build_wicket_marker_view_model(detail),
+            }
         except MatchesApiError as exc:
             return render_template(
                 "match_detail.html",
@@ -150,6 +166,7 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
                 error_message=str(exc),
                 query=query,
                 format_date_range=format_date_range,
+                graph_model=graph_model,
             ), 502
 
         return render_template(
@@ -165,6 +182,7 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
             error_message=None,
             query=query,
             format_date_range=format_date_range,
+            graph_model=graph_model,
             back_url=url_for("matches", **query.to_query_params()),
         )
 
