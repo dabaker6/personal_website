@@ -108,12 +108,49 @@ def has_graph_source_data(detail: dict[str, Any]) -> bool:
     return False
 
 
+def _count_innings_with_data(detail: dict[str, Any]) -> tuple[int, int]:
+    """Count total innings and innings with over-level data.
+    
+    Returns:
+        Tuple of (total_innings, innings_with_data)
+    """
+    document = detail.get("document", {}) if isinstance(detail, dict) else {}
+    innings_data = document.get("innings", []) if isinstance(document, dict) else []
+    if not isinstance(innings_data, list):
+        return 0, 0
+    
+    total = len(innings_data)
+    with_data = 0
+    
+    for innings in innings_data:
+        if not isinstance(innings, dict):
+            continue
+        overs = innings.get("overs", [])
+        if isinstance(overs, list) and overs:
+            with_data += 1
+    
+    return total, with_data
+
+
 def get_graph_availability(detail: dict[str, Any]) -> str:
+    """Determine graph availability state for match detail.
+    
+    Returns:
+        - "available": Limited-overs match with over-level data for all innings
+        - "partial": Limited-overs match with over-level data for only some innings
+        - "unavailable": Non-limited-overs match or limited-overs with no over-level data
+    """
     if not is_limited_overs_match_detail(detail):
-        return "not_applicable"
-    if has_graph_source_data(detail):
+        return "unavailable"
+    
+    total, with_data = _count_innings_with_data(detail)
+    
+    if with_data == 0:
+        return "unavailable"
+    elif with_data == total:
         return "available"
-    return "unavailable"
+    else:
+        return "partial"
 
 
 def _api_base_url() -> str:    
