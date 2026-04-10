@@ -838,6 +838,7 @@ a {
 }
 
 .progression-card {
+    position: relative;
     display: grid;
     gap: 0.85rem;
 }
@@ -867,6 +868,21 @@ a {
 
 .progression-chart circle:hover {
     r: 4;
+}
+
+.progression-wicket-marker {
+    cursor: pointer;
+}
+
+.progression-wicket-marker:hover,
+.progression-wicket-marker:focus {
+    r: 6;
+    outline: none;
+}
+
+.progression-wicket-marker:focus-visible {
+    outline: 3px solid rgba(255, 255, 255, 0.9);
+    outline-offset: 2px;
 }
 
 .progression-legend {
@@ -901,6 +917,9 @@ a {
 
 .progression-tooltip,
 [data-progression-tooltip] {
+    position: absolute;
+    z-index: 10;
+    pointer-events: none;
     max-width: 20rem;
     padding: 0.5rem 0.65rem;
     border-radius: 10px;
