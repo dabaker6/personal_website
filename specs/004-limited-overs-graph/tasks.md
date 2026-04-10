@@ -92,7 +92,7 @@
 
 - [X] T019 Add route-level regression coverage for qualifying, non-qualifying, multi-wicket, and partial-data cases in `tests/test_routes.py`
 - [X] T020 Run full verification for the feature through `tests/test_routes.py` and manual browser checks against `templates/match_detail.html`
-- [ ] T021 Update `specs/004-limited-overs-graph/plan.md` if implementation decisions materially change task ordering or graph-state assumptions
+- [X] T021 Update `specs/004-limited-overs-graph/plan.md` if implementation decisions materially change task ordering or graph-state assumptions
 
 ---
 

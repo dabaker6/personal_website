@@ -164,3 +164,31 @@ Independent completion check: `pytest` passes and manual checks confirm no regre
 ## Complexity Tracking
 
 No constitution violations expected. The feature intentionally avoids extra frameworks and keeps logic inside existing Flask/Jinja/vanilla JS boundaries.
+
+## Implementation Notes (post-execution)
+
+The following decisions diverged from or extended the original plan during execution. Recorded for future reference.
+
+### Python runtime version
+Plan stated Python 3.14; actual runtime is Python 3.13.9. No impact on implementation — no 3.14-specific APIs were used.
+
+### `get_graph_availability` state set
+The plan described three return values: `available`, `partial`, `unavailable`. An early draft also returned `not_applicable` for non-limited-overs matches but this was corrected to `unavailable` during T015 to keep the state set consistent with the plan contract.
+
+### `graph_model` context shape includes `is_limited_overs`
+The route passes `graph_model` as `{"availability", "is_limited_overs", "series", "wickets"}`. The `is_limited_overs` boolean was added to allow the template to gate the entire progression section without re-deriving match type in Jinja. This was not enumerated in the plan but is consistent with the architecture.
+
+### `_count_innings_with_data` helper
+A private helper was introduced in T015 to count total innings vs innings with over-level data, enabling precise `partial` vs `available` discrimination. The plan's T004 described this outcome but did not prescribe the helper decomposition.
+
+### `build_cumulative_runs_by_over` as a standalone public function
+The plan's T002 described an innings extractor as internal to the view-model builder. During T006 it was extracted as a separate public function (`build_cumulative_runs_by_over`) to keep the cumulative-runs logic independently testable and reusable.
+
+### Wicket marker payload fields
+The plan described batter, bowler, and dismissal method. The implementation also carries `dismissal` (same value as `dismissal_method`), `index_in_over` (for same-over stacking offset in the SVG renderer), `innings_number`, `team`, `over`, and `cumulative_runs`. These are additive and do not conflict with the plan contract.
+
+### Chart rendered as inline SVG string
+The plan referenced browser-native SVG/DOM APIs. The implementation builds an SVG markup string via JS template literals and sets `innerHTML` on the chart host element. This is consistent with the "no client-side framework" constraint and does not require any build tooling.
+
+### Task numbering
+The plan's Discrete Agent Tasks are numbered T001–T014 (14 tasks). The actual `tasks.md` uses a phase-annotated 21-task structure (T001–T021) that expands the plan's tasks into smaller independently executable units. The mapping is consistent; the tasks.md breakdown simply provides finer granularity.
