@@ -178,12 +178,12 @@
             {% elif graph_model.availability == "partial" %}
             <article class="fallback-card">
                 <h3>Progression graph partially available</h3>
-                <p>Some innings data is missing, so the graph may be incomplete for this match.</p>
+                <p>Over-by-over scoring data is available for some innings but not all. This match's scorecard is complete, but the progression graph may be incomplete.</p>
             </article>
             {% else %}
             <article class="fallback-card">
-                <h3>Progression graph unavailable</h3>
-                <p>This limited-overs match does not include enough over-by-over data to render the graph.</p>
+                <h3>Progression graph not available</h3>
+                <p>This match does not include over-by-over scoring detail. The match summary and final scorecard remain available below.</p>
             </article>
             {% endif %}
         </section>
