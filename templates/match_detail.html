@@ -9,6 +9,9 @@
     <article class="fallback-card" role="status">
         <h2>Summary unavailable</h2>
         <p>{{ error_message }}</p>
+        <div class="cta-row">
+            <a class="button-secondary" href="{{ back_url }}">Back to search results</a>
+        </div>
     </article>
     {% elif summary %}
     <article class="info-card tall-card match-summary-card">

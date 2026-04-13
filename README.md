@@ -38,6 +38,12 @@ The matches feature calls an upstream backend API. Set `MATCHES_API_BASE_URL` be
 $env:MATCHES_API_BASE_URL = "http://127.0.0.1:8000/api/v1"
 ```
 
+You can also tune request timeout behavior (default: 10 seconds):
+
+```powershell
+$env:MATCHES_API_TIMEOUT_SECONDS = "15"
+```
+
 ## Run tests
 
 ```powershell

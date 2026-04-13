@@ -268,8 +268,29 @@ def test_match_detail_route_handles_upstream_error(monkeypatch):
     with app.test_client() as client:
         response = client.get("/matches/abc123")
 
+    text = response.get_data(as_text=True)
     assert response.status_code == 502
-    assert "Provider unavailable" in response.get_data(as_text=True)
+    assert "Provider unavailable" in text
+    assert "Back to search results" in text
+    assert 'href="/matches"' in text
+
+
+def test_match_detail_route_returns_504_for_upstream_timeout(monkeypatch):
+    app = create_app()
+    app.config.update(TESTING=True)
+
+    from matches_api import MatchesApiError
+
+    def _raise_timeout(_match_id):
+        raise MatchesApiError("The matches API did not respond within 10 seconds.", status_code=504)
+
+    monkeypatch.setattr("app.get_match_detail", _raise_timeout)
+
+    with app.test_client() as client:
+        response = client.get("/matches/abc123")
+
+    assert response.status_code == 504
+    assert "did not respond within 10 seconds" in response.get_data(as_text=True)
 
 
 # ---------------------------------------------------------------------------

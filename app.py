@@ -153,6 +153,7 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
                 "wickets": build_wicket_marker_view_model(detail),
             }
         except MatchesApiError as exc:
+            status_code = 504 if exc.status_code == 504 else 502
             return render_template(
                 "match_detail.html",
                 page={
@@ -167,7 +168,8 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
                 query=query,
                 format_date_range=format_date_range,
                 graph_model=graph_model,
-            ), 502
+                back_url=url_for("matches", **query.to_query_params()),
+            ), status_code
 
         return render_template(
             "match_detail.html",

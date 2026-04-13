@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import socket
 import os
 from dataclasses import dataclass
 from datetime import date
@@ -157,15 +158,25 @@ def _api_base_url() -> str:
     return os.environ.get("MATCHES_API_BASE_URL", "http://127.0.0.1:8000/api/v1").rstrip("/")
 
 
+def _api_timeout_seconds() -> float:
+    raw_timeout = os.environ.get("MATCHES_API_TIMEOUT_SECONDS", "10")
+    try:
+        timeout = float(raw_timeout)
+    except (TypeError, ValueError):
+        return 10.0
+    return timeout if timeout > 0 else 10.0
+
+
 def _fetch_json(path: str, query: dict[str, str] | None = None) -> dict[str, Any]:
     base = _api_base_url()
+    timeout_seconds = _api_timeout_seconds()
     url = f"{base}{path}"
     if query:
         url = f"{url}?{parse.urlencode(query)}"
 
     req = request.Request(url, method="GET", headers={"Accept": "application/json"})
     try:
-        with request.urlopen(req, timeout=10) as response:
+        with request.urlopen(req, timeout=timeout_seconds) as response:
             payload = response.read().decode("utf-8")
             return json.loads(payload)
     except error.HTTPError as exc:
@@ -178,7 +189,17 @@ def _fetch_json(path: str, query: dict[str, str] | None = None) -> dict[str, Any
         except Exception:
             pass
         raise MatchesApiError(message, status_code=exc.code) from exc
+    except (TimeoutError, socket.timeout) as exc:
+        raise MatchesApiError(
+            f"The matches API did not respond within {timeout_seconds:g} seconds.",
+            status_code=504,
+        ) from exc
     except error.URLError as exc:
+        if isinstance(exc.reason, (TimeoutError, socket.timeout)):
+            raise MatchesApiError(
+                f"The matches API did not respond within {timeout_seconds:g} seconds.",
+                status_code=504,
+            ) from exc
         raise MatchesApiError("Unable to reach the matches API right now.") from exc
 
 
