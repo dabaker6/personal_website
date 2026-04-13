@@ -188,6 +188,14 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
             back_url=url_for("matches", **query.to_query_params()),
         )
 
+    @app.errorhandler(404)
+    def page_not_found(_error: Any) -> tuple[str, int]:
+        return render_template(
+            "404.html",
+            page=get_page(site_content, "not_found"),
+            page_name="",
+        ), 404
+
     return app
 
 load_dotenv()  # Load environment variables from .env file

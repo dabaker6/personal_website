@@ -141,6 +141,29 @@ def test_update_detail_route_returns_404_for_missing_slug(client):
     response = client.get("/updates/does-not-exist")
 
     assert response.status_code == 404
+    assert "This page has stepped off the pitch." in response.get_data(as_text=True)
+
+
+def test_unknown_route_uses_custom_404_page_from_content_overrides():
+    app = create_app(
+        {
+            "pages": {
+                "not_found": {
+                    "headline": "Custom not found heading",
+                    "intro": "Custom not found body",
+                }
+            }
+        }
+    )
+    app.config.update(TESTING=True)
+
+    with app.test_client() as client:
+        response = client.get("/this-route-does-not-exist")
+
+    text = response.get_data(as_text=True)
+    assert response.status_code == 404
+    assert "Custom not found heading" in text
+    assert "Custom not found body" in text
 
 
 def test_updates_feed_exposes_search_and_filter_markers_for_client_side_behavior(client):

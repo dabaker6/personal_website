@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel-stack">
+    <p class="eyebrow">{{ page.eyebrow }}</p>
+    <h1>{{ page.headline }}</h1>
+    <p class="lead-copy">{{ page.intro }}</p>
+    <div class="cta-row">
+        <a class="button-primary" href="{{ url_for(page.primary_cta.endpoint) }}">{{ page.primary_cta.label }}</a>
+        <a class="button-secondary" href="{{ url_for(page.secondary_cta.endpoint) }}">{{ page.secondary_cta.label }}</a>
+    </div>
+</section>
+{% endblock %}

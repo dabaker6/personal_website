@@ -111,6 +111,18 @@ SITE_CONTENT: dict[str, Any] = {
                 "soon for updated public channels."
             ),
         },
+        "not_found": {
+            "title": "Page not found",
+            "meta_description": "The page you requested could not be found.",
+            "eyebrow": "404",
+            "headline": "This page has stepped off the pitch.",
+            "intro": (
+                "The link may be outdated or the address may be mistyped. "
+                "Try heading back home or browse the latest updates."
+            ),
+            "primary_cta": {"label": "Go to home", "endpoint": "home"},
+            "secondary_cta": {"label": "Read updates", "endpoint": "updates"},
+        },
     },
     "contact_methods": [
         {
