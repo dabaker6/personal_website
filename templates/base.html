@@ -13,12 +13,23 @@
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
     <div class="page-shell">
-        <header class="site-header">
+        <header class="site-header" data-mobile-nav data-nav-open="false">
             <div class="brand-block">
                 <a class="brand-mark" href="{{ url_for('home') }}">{{ site.name }}</a>
                 <p class="brand-copy">{{ site.role }}</p>
             </div>
-            <nav class="site-nav" aria-label="Primary">
+            <button
+                class="nav-toggle"
+                type="button"
+                aria-controls="primary-nav"
+                aria-expanded="false"
+                aria-label="Toggle navigation menu"
+                data-nav-toggle
+            >
+                <span class="nav-toggle-bars" aria-hidden="true"></span>
+                <span class="sr-only">Menu</span>
+            </button>
+            <nav class="site-nav" id="primary-nav" aria-label="Primary" data-nav-menu>
                 {% for item in navigation %}
                 <a class="nav-link{% if item.slug == page_name %} is-active{% endif %}" href="{{ url_for(item.endpoint) }}">{{ item.label }}</a>
                 {% endfor %}
@@ -34,5 +45,6 @@
             <p>Designed to be responsive now and extend cleanly later.</p>
         </footer>
     </div>
+    <script src="{{ url_for('static', filename='js/site_nav.js') }}"></script>
 </body>
 </html>

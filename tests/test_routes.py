@@ -31,6 +31,8 @@ def test_home_route_returns_server_rendered_html(client):
     assert "Contact" in text
     assert "Updates" in text
     assert "Cricket Data" in text
+    assert 'data-nav-toggle' in text
+    assert 'id="primary-nav"' in text
 
 
 @pytest.mark.parametrize(
