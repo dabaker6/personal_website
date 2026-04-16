@@ -33,5 +33,4 @@ specs/
 .DS_Store
 
 # Exclude Docker files themselves if needed
-Dockerfile*
 docker-compose*.yml
