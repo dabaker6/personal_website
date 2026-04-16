@@ -7,7 +7,7 @@ name: Build and deploy Python app to Azure Web App - app-dev-baker-246
 on:
   push:
     branches:
-      - main
+      - container-yaml
 
 env:
   ACR_NAME: ${{secrets.PERSONAL_WEBSITE_ACR_NAME}}
