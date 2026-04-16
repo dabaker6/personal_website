@@ -9,6 +9,10 @@ on:
     branches:
       - container-yaml
 
+permissions:
+  id-token: write 
+  contents: read
+
 env:
   ACR_NAME: ${{secrets.PERSONAL_WEBSITE_ACR_NAME}}
   IMAGE_NAME: ${{secrets.PERSONAL_WEBSITE_IMAGE_NAME}}
