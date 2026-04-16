@@ -24,12 +24,9 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-
-      - name: Debug files
-        run: |
-          pwd
-          ls -la
-          
+      - name: Checkout repo
+        uses: actions/checkout@v4          
+        
       - name: Azure Login
         uses: azure/login@v2
         with:
