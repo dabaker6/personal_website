@@ -24,6 +24,12 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
+
+      - name: Debug files
+        run: |
+          pwd
+          ls -la
+          
       - name: Azure Login
         uses: azure/login@v2
         with:
