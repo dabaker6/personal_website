@@ -24,8 +24,8 @@ jobs:
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID_GITHUB_OIDC_DEPLOY }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID_144188C07A584B7488578FFFBB2EC71A }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID_6B2828A27EB748B4AF459CA9BACDFF0D }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_144188C07A584B7488578FFFBB2EC71A }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_6B2828A27EB748B4AF459CA9BACDFF0D }}
       
       - name: ACR Login
         run: |
