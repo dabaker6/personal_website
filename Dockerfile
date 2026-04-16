@@ -15,4 +15,4 @@ COPY . .
 EXPOSE 80
 
 # Run the application with Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:80", "app:create_app()"]
+CMD ["gunicorn", "--workers", "2", "--bind", "0.0.0.0:80", "app:app"]
