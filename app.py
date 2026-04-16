@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from flask import Flask, abort, render_template, request, url_for
+from flask import Flask, abort, jsonify, render_template, request, url_for
 
 from dotenv import load_dotenv
 
@@ -43,6 +43,11 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
             page=get_page(site_content, "home"),
             page_name="home",
         )
+    
+    @app.route("/health", methods=["GET"])
+    def health():
+        """Simple health check endpoint to verify the app is running."""
+        return jsonify({"status": "healthy"})
 
     @app.route("/about")
     def about() -> str:

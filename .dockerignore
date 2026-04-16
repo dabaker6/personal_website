@@ -1,0 +1,37 @@
+# Exclude version control
+.git
+.gitignore
+
+# Exclude Python cache and bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Exclude virtual environment
+.venv/
+venv/
+env/
+
+# Exclude environment files
+.env
+.env.local
+.env.production
+
+# Exclude tests
+tests/
+
+# Exclude development and documentation files
+README.md
+specs/
+.vscode/
+.idea/
+
+# Exclude logs and temporary files
+*.log
+*.tmp
+.DS_Store
+
+# Exclude Docker files themselves if needed
+Dockerfile*
+docker-compose*.yml
