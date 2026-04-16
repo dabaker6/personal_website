@@ -1,0 +1,54 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
+
+name: Build and deploy Python app to Azure Web App - app-dev-baker-246
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  ACR_NAME: ${{secrets.PERSONAL_WEBSITE_ACR_NAME}}
+  IMAGE_NAME: ${{secrets.PERSONAL_WEBSITE_IMAGE_NAME}}
+  IMAGE_TAG: v1.${{ github.sha }}
+  WEBAPP_NAME: ${{secrets.PERSONAL_WEBSITE_WEBAPP_NAME}}
+  RESOURCE_GROUP: ${{secrets.PERSONAL_WEBSITE_RG}}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID_GITHUB_OIDC_DEPLOY }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID_144188C07A584B7488578FFFBB2EC71A }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID_6B2828A27EB748B4AF459CA9BACDFF0D }}
+      
+      - name: ACR Login
+        run: |
+          az acr login --name $ACR_NAME  
+
+      - name: Build and push image
+        run: |
+          IMAGE="$ACR_NAME.azurecr.io/$IMAGE_NAME:$IMAGE_TAG"
+          docker build -t $IMAGE .
+          docker push $IMAGE
+
+      - name: Deploy Web App container
+        run: |
+          IMAGE="$ACR_NAME.azurecr.io/$IMAGE_NAME:$IMAGE_TAG"
+
+          az webapp config container set \
+            --name $WEBAPP_NAME \
+            --resource-group $RESOURCE_GROUP \
+            --docker-custom-image-name $IMAGE
+
+      - name: Restart Web App
+        run: |
+          az webapp restart \
+            --name $WEBAPP_NAME \
+            --resource-group $RESOURCE_GROUP
+          
