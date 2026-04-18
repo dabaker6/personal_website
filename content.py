@@ -10,7 +10,7 @@ SITE_CONTENT: dict[str, Any] = {
         "role": "Product-minded engineer",
         "tagline": "Built with GitHub spec kit and flask",
         "description": (
-            "An experienced full stack developer with a passion for clean design and reliable systems. "
+            "An experienced full stack developer with a passion for extensible, secure and reliable systems. "
         ),
         "location": "",
         "year": 2026,
@@ -27,15 +27,14 @@ SITE_CONTENT: dict[str, Any] = {
         "home": {
             "title": "Modern personal website",
             "meta_description": (
-                "A sleek, server-rendered personal website built with Flask and "
+                "A sleek, server-rendered personal website built using agentic AI workflows and "
                 "designed to grow cleanly over time."
             ),
             "eyebrow": "Personal website",
-            "hero_title": "Modern presentation, grounded in dependable engineering.",
+            "hero_title": "Modern cloud native design, built to grow.",
             "hero_body": (
                 "This site introduces who I am, what I care about, and how I build. "
-                "It is intentionally lightweight today and structured to welcome new "
-                "pages and backend-backed features later."
+                "New features are added to showcase skills or if I find some new interesting technology."
             ),
             "primary_cta": {"label": "Read the story", "endpoint": "about"},
             "secondary_cta": {"label": "See contact options", "endpoint": "contact"},
@@ -54,7 +53,7 @@ SITE_CONTENT: dict[str, Any] = {
                 },
                 {
                     "title": "Backend search flow",
-                    "body": "A Flask-rendered matches experience now connects to a browse API and detail endpoint without relying on client-side app code.",
+                    "body": "A Flask-rendered cricket matches experience now connects to a browse API and detail endpoint without relying on client-side app code.",
                 },
             ],
             "feature_panels": [
@@ -66,7 +65,7 @@ SITE_CONTENT: dict[str, Any] = {
                 {
                     "label": "Later",
                     "title": "Ready for growth",
-                    "body": "New routes, external services, and richer content can be added without rebuilding the site architecture from scratch.",
+                    "body": "Extensible design allows for new routes, external services, and richer content to be added without rebuilding the site architecture from scratch.",
                 },
             ],
         },
@@ -74,16 +73,16 @@ SITE_CONTENT: dict[str, Any] = {
             "title": "About",
             "meta_description": "Background, working style, and the principles behind the site owner.",
             "eyebrow": "About",
-            "headline": "I care about restraint, rhythm, and reliable systems.",
+            "headline": "I care about extensible, secure and user friendly design.",
             "intro": (
-                "My work sits between presentation and implementation. I like interfaces "
-                "that feel deliberate, and systems that remain easy to extend after the "
-                "first release."
+                "This site is a demonstration of my skills and interests as a builder, "
+                "and a home for sharing updates on my work and projects. "
+                "It is built using agentic AI workflows and Flask, designed to be responsive and extensible for future growth."
             ),
             "sections": [
                 {
                     "title": "Background",
-                    "body": "A skilled full stack developer with experience in startups and established companies, focused on building clean, user-friendly products that scale.",
+                    "body": "A skilled full stack developer with experience in startups and  multinational companies, focused on building clean, user-friendly products that scale.",
                 },
                 {
                     "title": "Working style",

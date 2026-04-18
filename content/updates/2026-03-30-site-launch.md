@@ -7,7 +7,7 @@ tags:
 summary: The personal website is now public. First version covers the landing page, about, and contact.
 ---
 
-After a short build sprint the site is up. The first release keeps things deliberately small: a landing page, an about section, and a contact page, all server-rendered with Flask and styled as one cohesive system.
+After a short build sprint useinmg Github Speckit as a chance to learn more about agentic AI coding, the site is up. The first release keeps things deliberately small: a landing page, an about section, and a contact page, all server-rendered with Flask and styled as one cohesive system.
 
 ## What shipped
 
