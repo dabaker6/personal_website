@@ -40,12 +40,88 @@
             statusMessage.hidden = false;
         }
 
+        function stopPolling() {
+            if (pollTimer !== null) {
+                clearInterval(pollTimer);
+                pollTimer = null;
+            }
+            if (zeroReplicaTimer !== null) {
+                clearTimeout(zeroReplicaTimer);
+                zeroReplicaTimer = null;
+            }
+        }
+
+        function updateReplicaCount(value) {
+            var panel = container.querySelector("[data-replica-count]");
+            if (!panel) return;
+            var valueEl = panel.querySelector(".metric-value");
+            if (valueEl) valueEl.textContent = value;
+        }
+
+        function renderChart(currentReadings) {
+            // T010: chart rendering implemented here
+        }
+
+        function handleZeroReplicas(replicaCount) {
+            // T011: zero-replica timeout logic implemented here
+        }
+
+        function pollStatus() {
+            fetch("/scaling/api/status")
+                .then(function (response) {
+                    return response.json().then(function (data) {
+                        return { status: response.status, data: data };
+                    });
+                })
+                .then(function (result) {
+                    if (result.status !== 200) {
+                        stopPolling();
+                        showStatus(
+                            "Monitoring stopped — " +
+                                (result.data.error || "an error occurred during monitoring.")
+                        );
+                        return;
+                    }
+
+                    var elapsed = Date.now() - monitoringStart;
+                    var queueLength = result.data.queue_length;
+                    var replicaCount = result.data.replica_count;
+
+                    readings.push({ elapsed_ms: elapsed, queue_length: queueLength });
+                    updateReplicaCount(replicaCount);
+                    renderChart(readings);
+                    handleZeroReplicas(replicaCount);
+
+                    if (queueLength === 0) {
+                        stopPolling();
+                        showStatus("Queue cleared — scaling event complete.");
+                        return;
+                    }
+
+                    if (elapsed >= config.maxMonitoringSeconds * 1000) {
+                        stopPolling();
+                        showStatus(
+                            "Monitoring ended — maximum duration reached without the queue clearing."
+                        );
+                    }
+                })
+                .catch(function () {
+                    stopPolling();
+                    showStatus("Monitoring stopped — unable to reach the scaling service.");
+                });
+        }
+
+        function beginPolling() {
+            pollTimer = setInterval(pollStatus, config.pollingIntervalMs);
+        }
+
         function startMonitoring() {
             monitoringStart = Date.now();
             readings = [];
             form.hidden = true;
             chartSection.hidden = false;
             showStatus("Messages sent — monitoring scaling activity.");
+            beginPolling();
         }
 
         function validate(raw) {
