@@ -69,11 +69,11 @@
 
 **Task Sequence**:
 
-- [ ] T006 [P] Add placeholder markup for queue-depth and replica-count metric panels in `templates/scaling.html`
+- [x] T006 [P] Add placeholder markup for queue-depth and replica-count metric panels in `templates/scaling.html`
 
-- [ ] T007 [P] Add CSS styling for placeholders with gray background, loading indicator, and same height as real metrics in `static/css/site.css`
+- [x] T007 [P] Add CSS styling for placeholders with gray background, loading indicator, and same height as real metrics in `static/css/site.css`
 
-- [ ] T008 Create JavaScript logic in `static/js/scaling.js` to replace placeholders with real metric values after initial API call completes without page reload
+- [x] T008 Create JavaScript logic in `static/js/scaling.js` to replace placeholders with real metric values after initial API call completes without page reload
 
 ---
 
@@ -242,9 +242,9 @@ Use this checklist to track progress:
 - [x] T003 - Background polling error handling
 - [x] T004 - Background polling lifecycle
 - [x] T005 - Background polling tests
-- [ ] T006 - Placeholder markup
-- [ ] T007 - Placeholder styling
-- [ ] T008 - Placeholder replacement logic
+- [x] T006 - Placeholder markup
+- [x] T007 - Placeholder styling
+- [x] T008 - Placeholder replacement logic
 - [ ] T009 - Eager chart polling start
 - [ ] T010 - Chart elapsed_ms ≈ 0
 - [ ] T011 - Eager polling tests

@@ -1014,6 +1014,17 @@ a {
     color: var(--muted);
 }
 
+.metric-value.placeholder {
+    background-color: rgba(128, 128, 128, 0.15);
+    color: var(--muted);
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    min-height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .send-form {
     display: flex;
     flex-direction: column;

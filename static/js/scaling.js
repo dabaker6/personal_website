@@ -83,6 +83,33 @@
             backgroundPollTimer = setInterval(backgroundPollStatus, config.backgroundPollingIntervalMs);
         }
 
+        function replacePlaceholders() {
+            fetch("/scaling/api/status")
+                .then(function (response) {
+                    return response.json().then(function (data) {
+                        return { status: response.status, data: data };
+                    });
+                })
+                .then(function (result) {
+                    if (result.status === 200) {
+                        var queueLengthPanel = container.querySelector("[data-queue-depth] .metric-value");
+                        var replicaCountPanel = container.querySelector("[data-replica-count] .metric-value");
+
+                        if (queueLengthPanel && queueLengthPanel.classList.contains("placeholder")) {
+                            queueLengthPanel.textContent = result.data.queue_length;
+                            queueLengthPanel.classList.remove("placeholder");
+                        }
+
+                        if (replicaCountPanel && replicaCountPanel.classList.contains("placeholder")) {
+                            replicaCountPanel.textContent = result.data.replica_count;
+                            replicaCountPanel.classList.remove("placeholder");
+                        }
+                    }
+                })
+                .catch(function () {
+                });
+        }
+
         function updateReplicaCount(value) {
             var panel = container.querySelector("[data-replica-count]");
             if (!panel) return;
@@ -339,6 +366,7 @@
                 });
         });
 
+        replacePlaceholders();
         startBackgroundPolling();
     });
 })();

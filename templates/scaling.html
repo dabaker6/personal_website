@@ -25,12 +25,12 @@
         <div class="card-grid">
             <article class="info-card" data-queue-depth>
                 <p class="eyebrow">Queue depth</p>
-                <p class="metric-value">{{ queue_depth }}</p>
+                <p class="metric-value{% if queue_depth is none %} placeholder{% endif %}">{% if queue_depth is none %}Loading…{% else %}{{ queue_depth }}{% endif %}</p>
                 <p class="metric-label">messages waiting</p>
             </article>
             <article class="info-card" data-replica-count>
                 <p class="eyebrow">Replica count</p>
-                <p class="metric-value">{{ replica_count }}</p>
+                <p class="metric-value{% if replica_count is none %} placeholder{% endif %}">{% if replica_count is none %}Loading…{% else %}{{ replica_count }}{% endif %}</p>
                 <p class="metric-label">active instances</p>
             </article>
         </div>
