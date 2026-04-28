@@ -27,9 +27,9 @@
 
 ### Background Polling Environment Variable & Research Documentation
 
-- [ ] T001 Add `BACKGROUND_POLLING_INTERVAL_MS` environment variable and pass to template in `app.py` /scaling route
+- [x] T001 Add `BACKGROUND_POLLING_INTERVAL_MS` environment variable and pass to template in `app.py` /scaling route
 
-- [ ] T018 Write `specs/006-scaling-enhancements/research.md` documenting decisions on placeholder design, polling interval defaults, eager polling mechanism (client-side), and navigation scope impact
+- [x] T018 Write `specs/006-scaling-enhancements/research.md` documenting decisions on placeholder design, polling interval defaults, eager polling mechanism (client-side), and navigation scope impact
 
 **→ STOP & REVIEW**: After T001–T018 complete, review research.md to validate design decisions before proceeding with implementation.
 
@@ -234,8 +234,8 @@ Final documentation, integration testing, regression validation, and responsive 
 Use this checklist to track progress:
 
 **Phase 2 (Foundational)**:
-- [ ] T001 - Background polling env variable
-- [ ] T018 - research.md documentation (⏸️ REVIEW CHECKPOINT)
+- [x] T001 - Background polling env variable
+- [x] T018 - research.md documentation (⏸️ REVIEW CHECKPOINT)
 
 **Phases 3–8 (User Stories & Features)**:
 - [ ] T002 - Background polling loop

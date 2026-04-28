@@ -36,6 +36,7 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
     app = Flask(__name__)
     site_content = get_site_content(content_overrides)
     scaling_config = {
+        "background_polling_interval_ms": int(os.environ.get("BACKGROUND_POLLING_INTERVAL_MS", "30000")),
         "polling_interval_ms": int(os.environ.get("POLLING_INTERVAL_MS", "5000")),
         "max_monitoring_seconds": int(os.environ.get("MAX_MONITORING_SECONDS", "300")),
         "zero_replica_timeout_seconds": int(os.environ.get("ZERO_REPLICA_TIMEOUT_SECONDS", "60")),
