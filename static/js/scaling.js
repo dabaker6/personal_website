@@ -59,11 +59,112 @@
         }
 
         function renderChart(currentReadings) {
-            // T010: chart rendering implemented here
+            if (!currentReadings || currentReadings.length === 0) return;
+
+            var svgNS = "http://www.w3.org/2000/svg";
+            var W = 500, H = 200;
+            var padLeft = 50, padRight = 16, padTop = 12, padBottom = 36;
+            var plotW = W - padLeft - padRight;
+            var plotH = H - padTop - padBottom;
+
+            var maxX = currentReadings[currentReadings.length - 1].elapsed_ms / 1000;
+            if (maxX < 1) maxX = 1;
+            var maxY = 0;
+            for (var i = 0; i < currentReadings.length; i++) {
+                if (currentReadings[i].queue_length > maxY) maxY = currentReadings[i].queue_length;
+            }
+            if (maxY < 1) maxY = 1;
+
+            function toSvgX(sec) { return padLeft + (sec / maxX) * plotW; }
+            function toSvgY(q) { return padTop + plotH - (q / maxY) * plotH; }
+
+            var svg = chartSection.querySelector("svg");
+            if (!svg) {
+                svg = document.createElementNS(svgNS, "svg");
+                svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+                svg.setAttribute("class", "chart-svg");
+                chartSection.appendChild(svg);
+            } else {
+                while (svg.firstChild) svg.removeChild(svg.firstChild);
+            }
+
+            var axes = document.createElementNS(svgNS, "polyline");
+            axes.setAttribute("points",
+                padLeft + "," + padTop + " " +
+                padLeft + "," + (padTop + plotH) + " " +
+                (padLeft + plotW) + "," + (padTop + plotH)
+            );
+            axes.setAttribute("class", "chart-axis");
+            svg.appendChild(axes);
+
+            var yLabel = document.createElementNS(svgNS, "text");
+            yLabel.setAttribute("x", padLeft - 4);
+            yLabel.setAttribute("y", padTop + 4);
+            yLabel.setAttribute("class", "chart-label");
+            yLabel.setAttribute("text-anchor", "end");
+            yLabel.textContent = maxY;
+            svg.appendChild(yLabel);
+
+            var xOrigin = document.createElementNS(svgNS, "text");
+            xOrigin.setAttribute("x", padLeft);
+            xOrigin.setAttribute("y", padTop + plotH + 20);
+            xOrigin.setAttribute("class", "chart-label");
+            xOrigin.setAttribute("text-anchor", "middle");
+            xOrigin.textContent = "0s";
+            svg.appendChild(xOrigin);
+
+            var xLabel = document.createElementNS(svgNS, "text");
+            xLabel.setAttribute("x", padLeft + plotW);
+            xLabel.setAttribute("y", padTop + plotH + 20);
+            xLabel.setAttribute("class", "chart-label");
+            xLabel.setAttribute("text-anchor", "end");
+            xLabel.textContent = Math.round(maxX) + "s";
+            svg.appendChild(xLabel);
+
+            if (currentReadings.length === 1) {
+                var r = currentReadings[0];
+                var dot = document.createElementNS(svgNS, "circle");
+                dot.setAttribute("cx", toSvgX(r.elapsed_ms / 1000));
+                dot.setAttribute("cy", toSvgY(r.queue_length));
+                dot.setAttribute("r", 4);
+                dot.setAttribute("class", "chart-point");
+                svg.appendChild(dot);
+            } else {
+                var pts = [];
+                for (var j = 0; j < currentReadings.length; j++) {
+                    pts.push(toSvgX(currentReadings[j].elapsed_ms / 1000) + "," + toSvgY(currentReadings[j].queue_length));
+                }
+                var line = document.createElementNS(svgNS, "polyline");
+                line.setAttribute("points", pts.join(" "));
+                line.setAttribute("class", "chart-line");
+                svg.appendChild(line);
+
+                for (var k = 0; k < currentReadings.length; k++) {
+                    var pt = document.createElementNS(svgNS, "circle");
+                    pt.setAttribute("cx", toSvgX(currentReadings[k].elapsed_ms / 1000));
+                    pt.setAttribute("cy", toSvgY(currentReadings[k].queue_length));
+                    pt.setAttribute("r", 3);
+                    pt.setAttribute("class", "chart-point");
+                    svg.appendChild(pt);
+                }
+            }
         }
 
         function handleZeroReplicas(replicaCount) {
-            // T011: zero-replica timeout logic implemented here
+            if (replicaCount === 0) {
+                if (zeroReplicaTimer === null) {
+                    zeroReplicaTimer = setTimeout(function () {
+                        zeroReplicaTimer = null;
+                        stopPolling();
+                        showStatus("Replicas did not recover — scaling may have stalled.");
+                    }, config.zeroReplicaTimeoutSeconds * 1000);
+                }
+            } else {
+                if (zeroReplicaTimer !== null) {
+                    clearTimeout(zeroReplicaTimer);
+                    zeroReplicaTimer = null;
+                }
+            }
         }
 
         function pollStatus() {
