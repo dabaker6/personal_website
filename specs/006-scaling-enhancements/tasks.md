@@ -10,14 +10,14 @@
 19 discrete tasks organized by user story priority (P1 first, then P2). Each task is independently implementable with clear file paths and completion signals. Parallelizable tasks marked [P] can run in parallel within the same phase.
 
 **Task Distribution**:
-- Phase 2 (Foundational): 1 task
+- Phase 2 (Foundational + Research): 2 tasks
 - Phase 3 (US1 - Live Metrics): 4 tasks
 - Phase 4 (US2 - Placeholders): 3 tasks
 - Phase 5 (US4 - Eager Polling): 3 tasks
 - Phase 6 (US6 - Queue Updates): 1 task (integrated with US1)
 - Phase 7 (US3 - Form Restoration): 2 tasks
 - Phase 8 (US5 - Navigation): 3 tasks
-- Phase 9 (Tests & Docs): 4 tasks
+- Phase 9 (Final Docs & Tests): 3 tasks
 
 **MVP Scope**: Phases 2–6 (US1, US2, US4, US6) deliver foundational live metrics and responsive UX with placeholders and eager polling. Phase 7–8 (US3, US5) add polish and IA improvements. Phase 9 ensures quality.
 
@@ -25,9 +25,13 @@
 
 ## Phase 2: Foundational Configuration
 
-### Background Polling Environment Variable
+### Background Polling Environment Variable & Research Documentation
 
 - [ ] T001 Add `BACKGROUND_POLLING_INTERVAL_MS` environment variable and pass to template in `app.py` /scaling route
+
+- [ ] T018 Write `specs/006-scaling-enhancements/research.md` documenting decisions on placeholder design, polling interval defaults, eager polling mechanism (client-side), and navigation scope impact
+
+**→ STOP & REVIEW**: After T001–T018 complete, review research.md to validate design decisions before proceeding with implementation.
 
 ---
 
@@ -146,11 +150,9 @@
 
 ---
 
-## Phase 9: Documentation, Testing & Validation
+## Phase 9: Final Documentation, Testing & Validation
 
 ### Design Documentation
-
-- [ ] T018 Write `specs/006-scaling-enhancements/research.md` documenting decisions on placeholder design, polling interval defaults, eager polling mechanism (client-side), and navigation scope impact
 
 - [ ] T019 Write `specs/006-scaling-enhancements/data-model.md` documenting polling configuration entity, placeholder states, form restoration state machine, and navigation hierarchy
 
@@ -194,30 +196,36 @@
 
 ### Example Parallel Execution Paths
 
-**Fast Path (MVP - 3 phases)**:
+**Review & MVP Path**:
 ```
-T001 → (T002–T005 parallel) → (T006–T008 parallel) → (T009–T012 parallel)
+T001 → T018 → [⏸️ REVIEW research.md] 
+     → (T002–T005 parallel) → (T006–T008 parallel) → (T009–T012 parallel)
 ```
 
 **Full Path (all features)**:
 ```
-T001 → (T002–T005) → (T006–T008) → (T009–T012) 
+T001 → T018 → [⏸️ REVIEW] 
+     → (T002–T005) → (T006–T008) → (T009–T012) 
      → (T013–T014) → (T015, T016–T017 parallel) 
-     → (T018–T019 parallel) → T020 → T021
+     → (T019–T020 parallel) → T021
 ```
 
 ---
 
 ## Implementation Strategy
 
-### MVP: Phases 2–6 (Features T001–T012)
-Delivers live metrics (background polling), responsive initial load (placeholders), and eager chart polling. Satisfies P1 user stories and success criteria SC-001 through SC-006.
+### MVP: Phases 2–6 (Features T001–T018, then T002–T012)
+1. **Setup & Review** (T001, T018): Add background polling config and write research.md documenting design decisions
+2. **⏸️ REVIEW CHECKPOINT**: Review research.md to validate decisions before implementation
+3. **Implement** (T002–T012): Deliver live metrics (background polling), responsive initial load (placeholders), and eager chart polling
+
+This satisfies **all P1 user stories** and success criteria SC-001 through SC-006, with documented rationale for design choices.
 
 ### Polish: Phases 7–8 (Features T013–T017)
 Adds form restoration and navigation IA improvements (P2 stories). Enhances discoverability and multi-experiment workflows.
 
-### Quality: Phase 9 (Features T018–T021)
-Documentation, integration testing, regression validation, and responsive design verification.
+### Quality: Phase 9 (Features T019–T021)
+Final documentation, integration testing, regression validation, and responsive design verification.
 
 ---
 
@@ -225,7 +233,11 @@ Documentation, integration testing, regression validation, and responsive design
 
 Use this checklist to track progress:
 
+**Phase 2 (Foundational)**:
 - [ ] T001 - Background polling env variable
+- [ ] T018 - research.md documentation (⏸️ REVIEW CHECKPOINT)
+
+**Phases 3–8 (User Stories & Features)**:
 - [ ] T002 - Background polling loop
 - [ ] T003 - Background polling error handling
 - [ ] T004 - Background polling lifecycle
@@ -242,8 +254,32 @@ Use this checklist to track progress:
 - [ ] T015 - Navigation base.html restructure
 - [ ] T016 - Navigation content.py update
 - [ ] T017 - Navigation styling and JS
-- [ ] T018 - research.md documentation
+
+**Phase 9 (Final Documentation & Testing)**:
 - [ ] T019 - data-model.md documentation
 - [ ] T020 - quickstart.md documentation
 - [ ] T021 - Full test suite validation
+
+---
+
+## Next Steps
+
+**1. Create foundational setup + research.md**:
+```bash
+/speckit-implement specs/006-scaling-enhancements/tasks.md T001 T018
+```
+
+**2. Review research.md** to validate design decisions before implementation begins
+
+**3. Execute remaining tasks by phase** via `/speckit-implement`:
+```bash
+/speckit-implement specs/006-scaling-enhancements/tasks.md T002-T005    # US1 (Live metrics)
+/speckit-implement specs/006-scaling-enhancements/tasks.md T006-T008    # US2 (Placeholders)
+/speckit-implement specs/006-scaling-enhancements/tasks.md T009-T012    # US4 & US6 (Eager polling + queue updates)
+/speckit-implement specs/006-scaling-enhancements/tasks.md T013-T014    # US3 (Form restoration)
+/speckit-implement specs/006-scaling-enhancements/tasks.md T015-T017    # US5 (Navigation redesign)
+/speckit-implement specs/006-scaling-enhancements/tasks.md T019-T021    # Final documentation & testing
+```
+
+Ready to begin with T001 + T018 for the review checkpoint?
 
