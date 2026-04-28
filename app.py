@@ -14,6 +14,7 @@ from aca_scaling_api import (
     get_queue_length,
     get_replica_count,
     get_revision_name,
+    send_messages,
 )
 from content import get_page, get_site_content
 from matches_api import (
@@ -244,6 +245,26 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
             "replica_count": replica_count,
             "revision_name": revision_name,
         })
+
+    @app.route("/scaling/api/send", methods=["POST"])
+    def scaling_api_send():
+        data = request.get_json(silent=True) or {}
+        count = data.get("count")
+
+        min_msg = scaling_config["min_messages"]
+        max_msg = scaling_config["max_messages"]
+
+        if not isinstance(count, int) or not (min_msg <= count <= max_msg):
+            return jsonify({"error": f"count must be an integer between {min_msg} and {max_msg}"}), 400
+
+        try:
+            send_messages(count)
+        except AcaScalingApiError as exc:
+            if exc.status_code == 429:
+                return jsonify({"error": str(exc), "queue_length": exc.active_message_count}), 429
+            return jsonify({"error": str(exc)}), 500
+
+        return jsonify({"message_count": count}), 202
 
     @app.errorhandler(404)
     def page_not_found(_error: Any) -> tuple[str, int]:
