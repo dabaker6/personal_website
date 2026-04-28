@@ -69,7 +69,7 @@ def _request(path: str, expect_json: bool = True) -> Any:
 
 def get_revision_name() -> str:
     """Return the active Container App revision name."""
-    result = _request("/api/v1/revisionName/")
+    result = _request("/revisionName/")
     if not isinstance(result, str) or not result:
         raise AcaScalingApiError("Unexpected response format for revision name.")
     return result
@@ -77,7 +77,7 @@ def get_revision_name() -> str:
 
 def get_replica_count(revision_name: str) -> int:
     """Return the current replica count for *revision_name*."""
-    result = _request(f"/api/v1/replicas/{revision_name}")
+    result = _request(f"/replicas/{revision_name}")
     if not isinstance(result, int):
         raise AcaScalingApiError("Unexpected response format for replica count.")
     return result
@@ -85,7 +85,7 @@ def get_replica_count(revision_name: str) -> int:
 
 def get_queue_length() -> int:
     """Return the current active message count in the Service Bus queue."""
-    result = _request("/api/v1/queue-length/")
+    result = _request("/queue-length/")
     if not isinstance(result, dict):
         raise AcaScalingApiError("Unexpected response format for queue length.")
     raw = result.get("activeMessageCount", "0")
@@ -97,5 +97,5 @@ def get_queue_length() -> int:
 
 def send_messages(count: int) -> int:
     """Enqueue *count* messages. Returns the accepted message count."""
-    _request(f"/api/v1/send-message/{count}", expect_json=False)
+    _request(f"/send-message/{count}", expect_json=False)
     return count
