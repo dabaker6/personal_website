@@ -627,3 +627,165 @@ def test_match_detail_route_shows_unavailable_fallback_for_qualifying_match_with
     text = response.get_data(as_text=True)
     assert "Progression graph not available" in text
     assert "data-progression-chart-payload" not in text
+
+
+# ---------------------------------------------------------------------------
+# 005-aca-scaling-dashboard: route and proxy endpoint tests
+# ---------------------------------------------------------------------------
+
+def _make_scaling_app(monkeypatch, *, revision="rev-1", replicas=2, queue=0):
+    """Return a test app with ACA API functions mocked to return happy-path values."""
+    app = create_app()
+    app.config.update(TESTING=True)
+    monkeypatch.setattr("app.get_revision_name", lambda: revision)
+    monkeypatch.setattr("app.get_replica_count", lambda _rev: replicas)
+    monkeypatch.setattr("app.get_queue_length", lambda: queue)
+    return app
+
+
+def test_scaling_page_renders_metric_panels(monkeypatch):
+    app = _make_scaling_app(monkeypatch, replicas=3, queue=42)
+
+    with app.test_client() as client:
+        response = client.get("/scaling")
+
+    assert response.status_code == 200
+    text = response.get_data(as_text=True)
+    assert "data-queue-depth" in text
+    assert "data-replica-count" in text
+    assert "42" in text
+    assert "3" in text
+
+
+def test_scaling_page_marks_nav_link_active(monkeypatch):
+    app = _make_scaling_app(monkeypatch)
+
+    with app.test_client() as client:
+        response = client.get("/scaling")
+
+    text = response.get_data(as_text=True)
+    assert "is-active" in text
+    assert 'href="/scaling"' in text
+
+
+def test_scaling_page_renders_error_fallback_on_aca_failure(monkeypatch):
+    from aca_scaling_api import AcaScalingApiError
+
+    app = create_app()
+    app.config.update(TESTING=True)
+    monkeypatch.setattr("app.get_revision_name", lambda: (_ for _ in ()).throw(
+        AcaScalingApiError("ACA service unavailable", status_code=503)
+    ))
+
+    with app.test_client() as client:
+        response = client.get("/scaling")
+
+    assert response.status_code == 200
+    text = response.get_data(as_text=True)
+    assert "Unable to load scaling data" in text
+    assert "ACA service unavailable" in text
+    assert "data-queue-depth" not in text
+
+
+def test_scaling_api_status_returns_json_on_success(monkeypatch):
+    app = _make_scaling_app(monkeypatch, revision="rev-abc", replicas=4, queue=100)
+
+    with app.test_client() as client:
+        response = client.get("/scaling/api/status")
+
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["queue_length"] == 100
+    assert data["replica_count"] == 4
+    assert data["revision_name"] == "rev-abc"
+
+
+def test_scaling_api_status_returns_500_on_aca_error(monkeypatch):
+    from aca_scaling_api import AcaScalingApiError
+
+    app = create_app()
+    app.config.update(TESTING=True)
+    monkeypatch.setattr("app.get_revision_name", lambda: (_ for _ in ()).throw(
+        AcaScalingApiError("Upstream failure", status_code=503)
+    ))
+
+    with app.test_client() as client:
+        response = client.get("/scaling/api/status")
+
+    assert response.status_code == 500
+    data = response.get_json()
+    assert "error" in data
+    assert "code" in data
+
+
+def test_scaling_api_send_returns_202_on_success(monkeypatch):
+    app = create_app()
+    app.config.update(TESTING=True)
+    monkeypatch.setattr("app.send_messages", lambda count: None)
+
+    with app.test_client() as client:
+        response = client.post(
+            "/scaling/api/send",
+            json={"count": 10},
+        )
+
+    assert response.status_code == 202
+    data = response.get_json()
+    assert data["message_count"] == 10
+
+
+def test_scaling_api_send_returns_400_for_out_of_range_count(monkeypatch):
+    app = create_app()
+    app.config.update(TESTING=True)
+
+    with app.test_client() as client:
+        response_low = client.post("/scaling/api/send", json={"count": 0})
+        response_high = client.post("/scaling/api/send", json={"count": 9999})
+        response_str = client.post("/scaling/api/send", json={"count": "ten"})
+
+    assert response_low.status_code == 400
+    assert response_high.status_code == 400
+    assert response_str.status_code == 400
+    assert "error" in response_low.get_json()
+
+
+def test_scaling_api_send_returns_429_with_queue_length_when_queue_not_empty(monkeypatch):
+    from aca_scaling_api import AcaScalingApiError
+
+    app = create_app()
+    app.config.update(TESTING=True)
+    monkeypatch.setattr(
+        "app.send_messages",
+        lambda _: (_ for _ in ()).throw(
+            AcaScalingApiError("Queue not empty", status_code=429, active_message_count=77)
+        ),
+    )
+
+    with app.test_client() as client:
+        response = client.post("/scaling/api/send", json={"count": 5})
+
+    assert response.status_code == 429
+    data = response.get_json()
+    assert data["queue_length"] == 77
+    assert "error" in data
+
+
+def test_scaling_api_send_returns_500_on_other_aca_error(monkeypatch):
+    from aca_scaling_api import AcaScalingApiError
+
+    app = create_app()
+    app.config.update(TESTING=True)
+    monkeypatch.setattr(
+        "app.send_messages",
+        lambda _: (_ for _ in ()).throw(
+            AcaScalingApiError("Internal failure", status_code=503)
+        ),
+    )
+
+    with app.test_client() as client:
+        response = client.post("/scaling/api/send", json={"count": 5})
+
+    assert response.status_code == 500
+    data = response.get_json()
+    assert "error" in data
+    assert "queue_length" not in data
