@@ -4,6 +4,7 @@
         if (!container) return;
 
         var config = {
+            backgroundPollingIntervalMs: parseInt(container.dataset.backgroundPollingIntervalMs, 10),
             pollingIntervalMs: parseInt(container.dataset.pollingIntervalMs, 10),
             maxMonitoringSeconds: parseInt(container.dataset.maxMonitoringSeconds, 10),
             zeroReplicaTimeoutSeconds: parseInt(container.dataset.zeroReplicaTimeoutSeconds, 10),
@@ -24,6 +25,8 @@
         var monitoringStart = null;
         var pollTimer = null;
         var zeroReplicaTimer = null;
+        var backgroundPollTimer = null;
+        var isMonitoring = false;
 
         function showInlineError(message) {
             inlineError.textContent = message;
@@ -51,8 +54,44 @@
             }
         }
 
+        function stopBackgroundPolling() {
+            if (backgroundPollTimer !== null) {
+                clearInterval(backgroundPollTimer);
+                backgroundPollTimer = null;
+            }
+        }
+
+        function backgroundPollStatus() {
+            fetch("/scaling/api/status")
+                .then(function (response) {
+                    return response.json().then(function (data) {
+                        return { status: response.status, data: data };
+                    });
+                })
+                .then(function (result) {
+                    if (result.status !== 200) {
+                        return;
+                    }
+                    updateReplicaCount(result.data.replica_count);
+                    updateQueueDepth(result.data.queue_length);
+                })
+                .catch(function () {
+                });
+        }
+
+        function startBackgroundPolling() {
+            backgroundPollTimer = setInterval(backgroundPollStatus, config.backgroundPollingIntervalMs);
+        }
+
         function updateReplicaCount(value) {
             var panel = container.querySelector("[data-replica-count]");
+            if (!panel) return;
+            var valueEl = panel.querySelector(".metric-value");
+            if (valueEl) valueEl.textContent = value;
+        }
+
+        function updateQueueDepth(value) {
+            var panel = container.querySelector("[data-queue-depth]");
             if (!panel) return;
             var valueEl = panel.querySelector(".metric-value");
             if (valueEl) valueEl.textContent = value;
@@ -177,10 +216,12 @@
                 .then(function (result) {
                     if (result.status !== 200) {
                         stopPolling();
+                        isMonitoring = false;
                         showStatus(
                             "Monitoring stopped — " +
                                 (result.data.error || "an error occurred during monitoring.")
                         );
+                        startBackgroundPolling();
                         return;
                     }
 
@@ -190,25 +231,32 @@
 
                     readings.push({ elapsed_ms: elapsed, queue_length: queueLength });
                     updateReplicaCount(replicaCount);
+                    updateQueueDepth(queueLength);
                     renderChart(readings);
                     handleZeroReplicas(replicaCount);
 
                     if (queueLength === 0) {
                         stopPolling();
+                        isMonitoring = false;
                         showStatus("Queue cleared — scaling event complete.");
+                        startBackgroundPolling();
                         return;
                     }
 
                     if (elapsed >= config.maxMonitoringSeconds * 1000) {
                         stopPolling();
+                        isMonitoring = false;
                         showStatus(
                             "Monitoring ended — maximum duration reached without the queue clearing."
                         );
+                        startBackgroundPolling();
                     }
                 })
                 .catch(function () {
                     stopPolling();
+                    isMonitoring = false;
                     showStatus("Monitoring stopped — unable to reach the scaling service.");
+                    startBackgroundPolling();
                 });
         }
 
@@ -217,6 +265,8 @@
         }
 
         function startMonitoring() {
+            isMonitoring = true;
+            stopBackgroundPolling();
             monitoringStart = Date.now();
             readings = [];
             form.hidden = true;
@@ -288,5 +338,7 @@
                     sendButton.disabled = false;
                 });
         });
+
+        startBackgroundPolling();
     });
 })();

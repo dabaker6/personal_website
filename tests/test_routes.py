@@ -789,3 +789,33 @@ def test_scaling_api_send_returns_500_on_other_aca_error(monkeypatch):
     data = response.get_json()
     assert "error" in data
     assert "queue_length" not in data
+
+
+def test_scaling_page_passes_background_polling_interval_to_template(monkeypatch):
+    """Test that /scaling route passes background_polling_interval_ms to template."""
+    app = _make_scaling_app(monkeypatch)
+
+    with app.test_client() as client:
+        response = client.get("/scaling")
+
+    assert response.status_code == 200
+    text = response.get_data(as_text=True)
+    assert "data-background-polling-interval-ms" in text
+    assert "30000" in text
+
+
+def test_scaling_page_passes_all_polling_config_to_template(monkeypatch):
+    """Test that /scaling route passes all polling config values to template."""
+    app = _make_scaling_app(monkeypatch)
+
+    with app.test_client() as client:
+        response = client.get("/scaling")
+
+    assert response.status_code == 200
+    text = response.get_data(as_text=True)
+    assert "data-background-polling-interval-ms" in text
+    assert "data-polling-interval-ms" in text
+    assert "data-max-monitoring-seconds" in text
+    assert "data-zero-replica-timeout-seconds" in text
+    assert "data-min-messages" in text
+    assert "data-max-messages" in text

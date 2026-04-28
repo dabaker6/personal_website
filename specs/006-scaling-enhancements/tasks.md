@@ -47,13 +47,13 @@
 
 **Task Sequence**:
 
-- [ ] T002 Create `startBackgroundPolling()` function in `static/js/scaling.js` that polls `/scaling/api/status` at `background_polling_interval_ms` and updates metric panels
+- [x] T002 Create `startBackgroundPolling()` function in `static/js/scaling.js` that polls `/scaling/api/status` at `background_polling_interval_ms` and updates metric panels
 
-- [ ] T003 Handle background polling errors silently in `static/js/scaling.js` without interrupting active monitoring
+- [x] T003 Handle background polling errors silently in `static/js/scaling.js` without interrupting active monitoring
 
-- [ ] T004 [P] Integrate background polling start into page load lifecycle in `static/js/scaling.js` (start before any submission, pause during monitoring, resume after)
+- [x] T004 [P] Integrate background polling start into page load lifecycle in `static/js/scaling.js` (start before any submission, pause during monitoring, resume after)
 
-- [ ] T005 [P] Add tests to `tests/test_routes.py` confirming background polling config is passed to template and `/scaling/api/status` is called correctly
+- [x] T005 [P] Add tests to `tests/test_routes.py` confirming background polling config is passed to template and `/scaling/api/status` is called correctly
 
 ---
 
@@ -238,10 +238,10 @@ Use this checklist to track progress:
 - [x] T018 - research.md documentation (⏸️ REVIEW CHECKPOINT)
 
 **Phases 3–8 (User Stories & Features)**:
-- [ ] T002 - Background polling loop
-- [ ] T003 - Background polling error handling
-- [ ] T004 - Background polling lifecycle
-- [ ] T005 - Background polling tests
+- [x] T002 - Background polling loop
+- [x] T003 - Background polling error handling
+- [x] T004 - Background polling lifecycle
+- [x] T005 - Background polling tests
 - [ ] T006 - Placeholder markup
 - [ ] T007 - Placeholder styling
 - [ ] T008 - Placeholder replacement logic
