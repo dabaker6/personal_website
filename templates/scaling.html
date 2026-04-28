@@ -7,25 +7,60 @@
     <p class="lead-copy">{{ page.intro }}</p>
 </section>
 
-<section class="panel-stack">
-    {% if error_message %}
-    <article class="fallback-card" role="status">
-        <h2>Unable to load scaling data</h2>
-        <p>{{ error_message }}</p>
-    </article>
-    {% else %}
-    <div class="card-grid">
-        <article class="info-card" data-queue-depth>
-            <p class="eyebrow">Queue depth</p>
-            <p class="metric-value">{{ queue_depth }}</p>
-            <p class="metric-label">messages waiting</p>
+<div class="dashboard-container"
+    data-polling-interval-ms="{{ polling_interval_ms }}"
+    data-max-monitoring-seconds="{{ max_monitoring_seconds }}"
+    data-zero-replica-timeout-seconds="{{ zero_replica_timeout_seconds }}"
+    data-min-messages="{{ min_messages }}"
+    data-max-messages="{{ max_messages }}"
+>
+    <section class="panel-stack">
+        {% if error_message %}
+        <article class="fallback-card" role="status">
+            <h2>Unable to load scaling data</h2>
+            <p>{{ error_message }}</p>
         </article>
-        <article class="info-card" data-replica-count>
-            <p class="eyebrow">Replica count</p>
-            <p class="metric-value">{{ replica_count }}</p>
-            <p class="metric-label">active instances</p>
-        </article>
-    </div>
-    {% endif %}
-</section>
+        {% else %}
+        <div class="card-grid">
+            <article class="info-card" data-queue-depth>
+                <p class="eyebrow">Queue depth</p>
+                <p class="metric-value">{{ queue_depth }}</p>
+                <p class="metric-label">messages waiting</p>
+            </article>
+            <article class="info-card" data-replica-count>
+                <p class="eyebrow">Replica count</p>
+                <p class="metric-value">{{ replica_count }}</p>
+                <p class="metric-label">active instances</p>
+            </article>
+        </div>
+        {% endif %}
+    </section>
+
+    <section class="panel-stack">
+        <form class="send-form" data-send-form>
+            <label for="message-count-input" class="eyebrow">Messages to send</label>
+            <div class="send-form-row">
+                <input
+                    id="message-count-input"
+                    type="number"
+                    name="count"
+                    min="{{ min_messages }}"
+                    max="{{ max_messages }}"
+                    placeholder="{{ min_messages }}–{{ max_messages }}"
+                    autocomplete="off"
+                    data-count-input
+                >
+                <button class="button-primary" type="submit" data-send-button>Send messages</button>
+            </div>
+            <p class="send-form-error" data-inline-error hidden></p>
+        </form>
+
+        <p class="status-message" data-status-message hidden></p>
+
+        <div class="chart-section" data-chart-section hidden>
+            <p class="eyebrow">Queue depth over time</p>
+        </div>
+    </section>
+</div>
+<script src="{{ url_for('static', filename='js/scaling.js') }}"></script>
 {% endblock %}
