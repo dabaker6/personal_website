@@ -112,8 +112,7 @@ As a visitor who has submitted messages, I want to see the queue depth plotted o
 ## Assumptions
 
 - The scaling service API (defined in `specs/openapi-aca-scaling.yaml`) is available and accessible from the personal website's server-side backend.
-- The minimum valid message count is 1; sending zero messages provides no observable scaling behaviour and is excluded from the allowed input range.
-- The maximum valid message count is 5000, matching the constraint defined in the scaling API.
+- The minimum and maximum valid message counts are configurable at deployment time (defaults: minimum 1, maximum 5000). The ACA API hard-caps at 5000 regardless of configuration.
 - Polling interval and maximum monitoring duration will be determined during planning; the spec assumes reasonable defaults will be chosen that allow scaling behaviour to become visible without excessive wait times.
 - Queue depth readings captured during a scaling event are held in memory for the duration of the page session and are not persisted to a database or retained across page navigations.
 - The dashboard is publicly accessible and does not require the visitor to authenticate.

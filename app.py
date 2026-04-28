@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from typing import Any
 
 from flask import Flask, abort, jsonify, render_template, request, url_for
@@ -8,6 +9,12 @@ from dotenv import load_dotenv
 
 from updates import get_available_tags, get_entry_by_slug, get_feed
 
+from aca_scaling_api import (
+    AcaScalingApiError,
+    get_queue_length,
+    get_replica_count,
+    get_revision_name,
+)
 from content import get_page, get_site_content
 from matches_api import (
     BrowseQuery,
@@ -27,6 +34,13 @@ from matches_api import (
 def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
     app = Flask(__name__)
     site_content = get_site_content(content_overrides)
+    scaling_config = {
+        "polling_interval_ms": int(os.environ.get("POLLING_INTERVAL_MS", "5000")),
+        "max_monitoring_seconds": int(os.environ.get("MAX_MONITORING_SECONDS", "300")),
+        "zero_replica_timeout_seconds": int(os.environ.get("ZERO_REPLICA_TIMEOUT_SECONDS", "60")),
+        "min_messages": int(os.environ.get("MIN_MESSAGES", "1")),
+        "max_messages": int(os.environ.get("MAX_MESSAGES", "5000")),
+    }
 
     @app.context_processor
     def inject_site_context() -> dict[str, Any]:
@@ -191,6 +205,29 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
             format_date_range=format_date_range,
             graph_model=graph_model,
             back_url=url_for("matches", **query.to_query_params()),
+        )
+
+    @app.route("/scaling")
+    def scaling() -> str:
+        error_message = None
+        queue_depth = None
+        replica_count = None
+
+        try:
+            revision_name = get_revision_name()
+            replica_count = get_replica_count(revision_name)
+            queue_depth = get_queue_length()
+        except AcaScalingApiError as exc:
+            error_message = str(exc)
+
+        return render_template(
+            "scaling.html",
+            page=get_page(site_content, "scaling"),
+            page_name="scaling",
+            queue_depth=queue_depth,
+            replica_count=replica_count,
+            error_message=error_message,
+            **scaling_config,
         )
 
     @app.errorhandler(404)
