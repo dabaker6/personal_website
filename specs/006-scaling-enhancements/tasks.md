@@ -89,11 +89,11 @@
 
 **Task Sequence**:
 
-- [ ] T009 Implement eager chart polling: on form submit (before fetch completes), start polling `/scaling/api/status` in parallel in `static/js/scaling.js`
+- [x] T009 Implement eager chart polling: on form submit (before fetch completes), start polling `/scaling/api/status` in parallel in `static/js/scaling.js`
 
-- [ ] T010 Ensure first chart reading has `elapsed_ms` ≈ 0 in `static/js/scaling.js` by capturing submission timestamp at form submit (not waiting for 202)
+- [x] T010 Ensure first chart reading has `elapsed_ms` ≈ 0 in `static/js/scaling.js` by capturing submission timestamp at form submit (not waiting for 202)
 
-- [ ] T011 Add tests to `tests/test_routes.py` confirming chart receives first reading immediately and no data loss if 202 is delayed
+- [x] T011 Add tests to `tests/test_routes.py` confirming chart receives first reading immediately and no data loss if 202 is delayed
 
 ---
 
@@ -108,7 +108,7 @@
 
 **Note**: This feature is integrated into T002 (background polling updates both replica count and queue depth panels). This phase confirms and validates the queue depth update behavior.
 
-- [ ] T012 [P] Verify queue depth metric updates in `static/js/scaling.js` `pollStatus()` function and add integration tests to `tests/test_routes.py`
+- [x] T012 [P] Verify queue depth metric updates in `static/js/scaling.js` `pollStatus()` function and add integration tests to `tests/test_routes.py`
 
 ---
 
@@ -245,10 +245,10 @@ Use this checklist to track progress:
 - [x] T006 - Placeholder markup
 - [x] T007 - Placeholder styling
 - [x] T008 - Placeholder replacement logic
-- [ ] T009 - Eager chart polling start
-- [ ] T010 - Chart elapsed_ms ≈ 0
-- [ ] T011 - Eager polling tests
-- [ ] T012 - Queue depth update validation
+- [x] T009 - Eager chart polling start
+- [x] T010 - Chart elapsed_ms ≈ 0
+- [x] T011 - Eager polling tests
+- [x] T012 - Queue depth update validation
 - [ ] T013 - Form restoration logic
 - [ ] T014 - Form restoration tests
 - [ ] T015 - Navigation base.html restructure

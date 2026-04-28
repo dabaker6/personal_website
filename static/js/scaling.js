@@ -325,6 +325,15 @@
 
             sendButton.disabled = true;
 
+            isMonitoring = true;
+            stopBackgroundPolling();
+            monitoringStart = Date.now();
+            readings = [];
+            form.hidden = true;
+            chartSection.hidden = false;
+            showStatus("Messages sent — monitoring scaling activity.");
+            beginPolling();
+
             fetch("/scaling/api/send", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -337,15 +346,23 @@
                 })
                 .then(function (result) {
                     if (result.status === 202) {
-                        startMonitoring();
                     } else if (result.status === 400) {
+                        stopPolling();
+                        isMonitoring = false;
+                        form.hidden = false;
+                        chartSection.hidden = true;
                         showInlineError(
                             result.data.error ||
                                 "Invalid count. Enter a number between " +
                                     config.minMessages + " and " + config.maxMessages + "."
                         );
                         sendButton.disabled = false;
+                        startBackgroundPolling();
                     } else if (result.status === 429) {
+                        stopPolling();
+                        isMonitoring = false;
+                        form.hidden = false;
+                        chartSection.hidden = true;
                         var queueLen = result.data.queue_length;
                         var msg = "Queue still active";
                         if (typeof queueLen === "number") {
@@ -353,16 +370,27 @@
                         }
                         showStatus(msg + ". Wait for the queue to clear before sending more messages.");
                         sendButton.disabled = false;
+                        startBackgroundPolling();
                     } else {
+                        stopPolling();
+                        isMonitoring = false;
+                        form.hidden = false;
+                        chartSection.hidden = true;
                         showStatus(
                             "Error: " + (result.data.error || "Something went wrong. Please try again.")
                         );
                         sendButton.disabled = false;
+                        startBackgroundPolling();
                     }
                 })
                 .catch(function () {
+                    stopPolling();
+                    isMonitoring = false;
+                    form.hidden = false;
+                    chartSection.hidden = true;
                     showStatus("Request failed. Check your connection and try again.");
                     sendButton.disabled = false;
+                    startBackgroundPolling();
                 });
         });
 

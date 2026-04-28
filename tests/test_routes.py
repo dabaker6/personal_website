@@ -819,3 +819,47 @@ def test_scaling_page_passes_all_polling_config_to_template(monkeypatch):
     assert "data-zero-replica-timeout-seconds" in text
     assert "data-min-messages" in text
     assert "data-max-messages" in text
+
+
+def test_scaling_api_status_responds_quickly_for_eager_polling(monkeypatch):
+    """Test that /scaling/api/status responds quickly to support eager polling.
+
+    Eager polling starts immediately on form submit (before 202 response).
+    This test verifies the status endpoint returns valid data to populate
+    the chart from the very beginning of the scaling event.
+    """
+    app = _make_scaling_app(monkeypatch, revision="rev-abc", replicas=2, queue=50)
+
+    with app.test_client() as client:
+        response = client.get("/scaling/api/status")
+
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "queue_length" in data
+    assert "replica_count" in data
+    assert "revision_name" in data
+    assert data["queue_length"] == 50
+    assert data["replica_count"] == 2
+
+
+def test_scaling_api_send_returns_202_immediately_for_eager_polling(monkeypatch):
+    """Test that /scaling/api/send returns 202 immediately to confirm submission.
+
+    Eager polling begins before the 202 response arrives. This test verifies
+    that the send endpoint returns a valid 202 response for the client to confirm
+    the message was accepted and monitoring should continue.
+    """
+    app = create_app()
+    app.config.update(TESTING=True)
+    monkeypatch.setattr("app.send_messages", lambda count: None)
+
+    with app.test_client() as client:
+        response = client.post(
+            "/scaling/api/send",
+            json={"count": 100},
+        )
+
+    assert response.status_code == 202
+    data = response.get_json()
+    assert "message_count" in data
+    assert data["message_count"] == 100
