@@ -21,7 +21,7 @@ SITE_CONTENT: dict[str, Any] = {
         {"label": "About", "endpoint": "about", "slug": "about"},
         {"label": "Contact", "endpoint": "contact", "slug": "contact"},        
         {"label": "Updates", "endpoint": "updates", "slug": "updates"},
-        
+        {"label": "Scaling", "endpoint": "scaling", "slug": "scaling"},
     ],
     "pages": {
         "home": {
@@ -108,6 +108,18 @@ SITE_CONTENT: dict[str, Any] = {
             "fallback_body": (
                 "A direct contact list is not available right now. Please check back "
                 "soon for updated public channels."
+            ),
+        },
+        "scaling": {
+            "title": "ACA Scaling Demo",
+            "meta_description": (
+                "Watch Azure Container App replicas scale in response to queue pressure in real time."
+            ),
+            "eyebrow": "Scaling",
+            "headline": "Queue-driven scaling, live.",
+            "intro": (
+                "Send messages to a queue and watch Azure Container App replicas respond in real time. "
+                "The chart below plots queue depth over time while the replica count updates automatically."
             ),
         },
         "not_found": {
