@@ -46,7 +46,7 @@
 
 ### Implementation for User Story 1
 
-- [ ] T006 [US1] Create templates/scaling.html extending base.html: page intro section (eyebrow, headline from page context); two labelled metric panels — queue depth (`data-queue-depth`) showing `{{ queue_depth }}` and replica count (`data-replica-count`) showing `{{ replica_count }}`; error fallback rendered when `error_message` is set; `page_name="scaling"` wired for active nav state
+- [x] T006 [US1] Create templates/scaling.html extending base.html: page intro section (eyebrow, headline from page context); two labelled metric panels — queue depth (`data-queue-depth`) showing `{{ queue_depth }}` and replica count (`data-replica-count`) showing `{{ replica_count }}`; error fallback rendered when `error_message` is set; `page_name="scaling"` wired for active nav state
 
 **Checkpoint**: GET /scaling renders both metric panels with server-side values; error fallback renders when error_message provided; Scaling nav link is marked active.
 

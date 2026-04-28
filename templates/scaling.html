@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-intro">
+    <p class="eyebrow">{{ page.eyebrow }}</p>
+    <h1>{{ page.headline }}</h1>
+    <p class="lead-copy">{{ page.intro }}</p>
+</section>
+
+<section class="panel-stack">
+    {% if error_message %}
+    <article class="fallback-card" role="status">
+        <h2>Unable to load scaling data</h2>
+        <p>{{ error_message }}</p>
+    </article>
+    {% else %}
+    <div class="card-grid">
+        <article class="info-card" data-queue-depth>
+            <p class="eyebrow">Queue depth</p>
+            <p class="metric-value">{{ queue_depth }}</p>
+            <p class="metric-label">messages waiting</p>
+        </article>
+        <article class="info-card" data-replica-count>
+            <p class="eyebrow">Replica count</p>
+            <p class="metric-value">{{ replica_count }}</p>
+            <p class="metric-label">active instances</p>
+        </article>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
