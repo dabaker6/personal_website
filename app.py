@@ -230,6 +230,21 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
             **scaling_config,
         )
 
+    @app.route("/scaling/api/status")
+    def scaling_api_status():
+        try:
+            revision_name = get_revision_name()
+            replica_count = get_replica_count(revision_name)
+            queue_length = get_queue_length()
+        except AcaScalingApiError as exc:
+            return jsonify({"error": str(exc), "code": "InternalServerError"}), 500
+
+        return jsonify({
+            "queue_length": queue_length,
+            "replica_count": replica_count,
+            "revision_name": revision_name,
+        })
+
     @app.errorhandler(404)
     def page_not_found(_error: Any) -> tuple[str, int]:
         return render_template(
