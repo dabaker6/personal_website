@@ -39,7 +39,7 @@ SITE_CONTENT: dict[str, Any] = {
             "eyebrow": "Personal website",
             "hero_title": "Modern cloud native design, built to grow.",
             "hero_body": (
-                "This site introduces who I am, what I care about, and how I build. "
+                "Modern presentation, grounded in dependable engineering. "
                 "New features are added to showcase skills or if I find some new interesting technology."
             ),
             "primary_cta": {"label": "Read the story", "endpoint": "about"},
@@ -79,7 +79,7 @@ SITE_CONTENT: dict[str, Any] = {
             "title": "About",
             "meta_description": "Background, working style, and the principles behind the site owner.",
             "eyebrow": "About",
-            "headline": "I care about extensible, secure and user friendly design.",
+            "headline": "I care about restraint, rhythm, and reliable systems.",
             "intro": (
                 "This site is a demonstration of my skills and interests as a builder, "
                 "and a home for sharing updates on my work and projects. "
