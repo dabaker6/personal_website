@@ -211,24 +211,13 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
 
     @app.route("/scaling")
     def scaling() -> str:
-        error_message = None
-        queue_depth = None
-        replica_count = None
-
-        try:
-            revision_name = get_revision_name()
-            replica_count = get_replica_count(revision_name)
-            queue_depth = get_queue_length()
-        except AcaScalingApiError as exc:
-            error_message = str(exc)
-
         return render_template(
             "scaling.html",
             page=get_page(site_content, "scaling"),
             page_name="scaling",
-            queue_depth=queue_depth,
-            replica_count=replica_count,
-            error_message=error_message,
+            queue_depth=None,
+            replica_count=None,
+            error_message=None,
             **scaling_config,
         )
 
@@ -280,7 +269,6 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
 load_dotenv()  # Load environment variables from .env file
 
 app = create_app()
-
 
 if __name__ == "__main__":
     app.run(debug=True)
