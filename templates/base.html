@@ -33,7 +33,20 @@
             </button>
             <nav class="site-nav" id="primary-nav" aria-label="Primary" data-nav-menu>
                 {% for item in navigation %}
+                {% if item.submenu %}
+                <div class="nav-group" data-nav-group="{{ item.slug }}">
+                    <button class="nav-link nav-group-toggle" type="button" aria-expanded="false" data-nav-group-toggle>
+                        {{ item.label }}
+                    </button>
+                    <div class="nav-submenu" data-nav-submenu>
+                        {% for subitem in item.submenu %}
+                        <a class="nav-link nav-sublink{% if subitem.slug == page_name %} is-active{% endif %}" href="{{ url_for(subitem.endpoint) }}">{{ subitem.label }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
                 <a class="nav-link{% if item.slug == page_name %} is-active{% endif %}" href="{{ url_for(item.endpoint) }}">{{ item.label }}</a>
+                {% endif %}
                 {% endfor %}
             </nav>
         </header>

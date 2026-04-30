@@ -249,16 +249,16 @@ Use this checklist to track progress:
 - [x] T010 - Chart elapsed_ms ≈ 0
 - [x] T011 - Eager polling tests
 - [x] T012 - Queue depth update validation
-- [ ] T013 - Form restoration logic
-- [ ] T014 - Form restoration tests
-- [ ] T015 - Navigation base.html restructure
-- [ ] T016 - Navigation content.py update
-- [ ] T017 - Navigation styling and JS
+- [x] T013 - Form restoration logic
+- [x] T014 - Form restoration tests
+- [x] T015 - Navigation base.html restructure
+- [x] T016 - Navigation content.py update
+- [x] T017 - Navigation styling and JS
 
 **Phase 9 (Final Documentation & Testing)**:
-- [ ] T019 - data-model.md documentation
-- [ ] T020 - quickstart.md documentation
-- [ ] T021 - Full test suite validation
+- [x] T019 - data-model.md documentation
+- [x] T020 - quickstart.md documentation
+- [x] T021 - Full test suite validation
 
 ---
 

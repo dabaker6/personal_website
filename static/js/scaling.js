@@ -83,6 +83,13 @@
             backgroundPollTimer = setInterval(backgroundPollStatus, config.backgroundPollingIntervalMs);
         }
 
+        function restoreForm() {
+            form.hidden = false;
+            countInput.value = "";
+            sendButton.disabled = false;
+            clearInlineError();
+        }
+
         function replacePlaceholders() {
             fetch("/scaling/api/status")
                 .then(function (response) {
@@ -248,6 +255,7 @@
                             "Monitoring stopped — " +
                                 (result.data.error || "an error occurred during monitoring.")
                         );
+                        restoreForm();
                         startBackgroundPolling();
                         return;
                     }
@@ -266,6 +274,7 @@
                         stopPolling();
                         isMonitoring = false;
                         showStatus("Queue cleared — scaling event complete.");
+                        restoreForm();
                         startBackgroundPolling();
                         return;
                     }
@@ -276,6 +285,7 @@
                         showStatus(
                             "Monitoring ended — maximum duration reached without the queue clearing."
                         );
+                        restoreForm();
                         startBackgroundPolling();
                     }
                 })
@@ -283,6 +293,7 @@
                     stopPolling();
                     isMonitoring = false;
                     showStatus("Monitoring stopped — unable to reach the scaling service.");
+                    restoreForm();
                     startBackgroundPolling();
                 });
         }
@@ -349,19 +360,17 @@
                     } else if (result.status === 400) {
                         stopPolling();
                         isMonitoring = false;
-                        form.hidden = false;
                         chartSection.hidden = true;
                         showInlineError(
                             result.data.error ||
                                 "Invalid count. Enter a number between " +
                                     config.minMessages + " and " + config.maxMessages + "."
                         );
-                        sendButton.disabled = false;
+                        restoreForm();
                         startBackgroundPolling();
                     } else if (result.status === 429) {
                         stopPolling();
                         isMonitoring = false;
-                        form.hidden = false;
                         chartSection.hidden = true;
                         var queueLen = result.data.queue_length;
                         var msg = "Queue still active";
@@ -369,27 +378,25 @@
                             msg += ", " + queueLen + " message" + (queueLen !== 1 ? "s" : "") + " remaining";
                         }
                         showStatus(msg + ". Wait for the queue to clear before sending more messages.");
-                        sendButton.disabled = false;
+                        restoreForm();
                         startBackgroundPolling();
                     } else {
                         stopPolling();
                         isMonitoring = false;
-                        form.hidden = false;
                         chartSection.hidden = true;
                         showStatus(
                             "Error: " + (result.data.error || "Something went wrong. Please try again.")
                         );
-                        sendButton.disabled = false;
+                        restoreForm();
                         startBackgroundPolling();
                     }
                 })
                 .catch(function () {
                     stopPolling();
                     isMonitoring = false;
-                    form.hidden = false;
                     chartSection.hidden = true;
                     showStatus("Request failed. Check your connection and try again.");
-                    sendButton.disabled = false;
+                    restoreForm();
                     startBackgroundPolling();
                 });
         });

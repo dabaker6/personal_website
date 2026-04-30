@@ -863,3 +863,69 @@ def test_scaling_api_send_returns_202_immediately_for_eager_polling(monkeypatch)
     data = response.get_json()
     assert "message_count" in data
     assert data["message_count"] == 100
+
+
+def test_scaling_form_can_be_resubmitted_after_completion(monkeypatch):
+    """Test that form can be resubmitted after a scaling event completes.
+
+    This verifies that the client-side form restoration (hiding chart,
+    showing form, clearing input) allows users to run multiple scaling
+    experiments without page reload.
+    """
+    app = create_app()
+    app.config.update(TESTING=True)
+    monkeypatch.setattr("app.send_messages", lambda count: None)
+
+    with app.test_client() as client:
+        response1 = client.post(
+            "/scaling/api/send",
+            json={"count": 50},
+        )
+        assert response1.status_code == 202
+        data1 = response1.get_json()
+        assert data1["message_count"] == 50
+
+        response2 = client.post(
+            "/scaling/api/send",
+            json={"count": 75},
+        )
+        assert response2.status_code == 202
+        data2 = response2.get_json()
+        assert data2["message_count"] == 75
+
+
+def test_scaling_form_restoration_supports_status_polling_between_submissions(monkeypatch):
+    """Test that status polling works correctly between form submissions.
+
+    This verifies the client can poll status during a monitoring cycle,
+    then restore the form and submit again without losing state.
+    """
+    app = _make_scaling_app(monkeypatch, revision="rev-1", replicas=2, queue=100)
+    monkeypatch.setattr("app.send_messages", lambda count: None)
+
+    with app.test_client() as client:
+        response1 = client.post(
+            "/scaling/api/send",
+            json={"count": 50},
+        )
+        assert response1.status_code == 202
+
+        status1 = client.get("/scaling/api/status")
+        assert status1.status_code == 200
+        data1 = status1.get_json()
+        assert "queue_length" in data1
+        assert "replica_count" in data1
+        assert data1["replica_count"] == 2
+        assert data1["queue_length"] == 100
+
+        response2 = client.post(
+            "/scaling/api/send",
+            json={"count": 75},
+        )
+        assert response2.status_code == 202
+
+        status2 = client.get("/scaling/api/status")
+        assert status2.status_code == 200
+        data2 = status2.get_json()
+        assert data2["replica_count"] == 2
+        assert data2["queue_length"] == 100

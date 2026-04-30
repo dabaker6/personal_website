@@ -22,6 +22,18 @@
     header.setAttribute("data-nav-ready", "true");
     setExpandedState(false);
 
+    const initializeSubmenus = function () {
+        const submenus = navMenu.querySelectorAll("[data-nav-submenu]");
+        submenus.forEach(function (submenu) {
+            submenu.setAttribute("aria-hidden", "true");
+        });
+        const toggles = navMenu.querySelectorAll("[data-nav-group-toggle]");
+        toggles.forEach(function (toggle) {
+            toggle.setAttribute("aria-expanded", "false");
+        });
+    };
+    initializeSubmenus();
+
     toggleButton.addEventListener("click", function () {
         const isExpanded = toggleButton.getAttribute("aria-expanded") === "true";
         setExpandedState(!isExpanded);
@@ -31,6 +43,15 @@
         const target = event.target;
         if (target instanceof Element && target.closest("a")) {
             closeMenu();
+        }
+        if (target instanceof Element && target.closest("[data-nav-group-toggle]")) {
+            const toggle = target.closest("[data-nav-group-toggle]");
+            const isExpanded = toggle.getAttribute("aria-expanded") === "true";
+            toggle.setAttribute("aria-expanded", !isExpanded ? "true" : "false");
+            const submenu = toggle.closest("[data-nav-group]").querySelector("[data-nav-submenu]");
+            if (submenu) {
+                submenu.setAttribute("aria-hidden", isExpanded ? "true" : "false");
+            }
         }
     });
 
