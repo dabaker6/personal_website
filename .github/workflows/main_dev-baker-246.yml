@@ -43,6 +43,7 @@ jobs:
           az acr build \
             --registry $ACR_NAME
             --"$IMAGE_NAME:$IMAGE_TAG
+            .
 
       - name: Deploy Web App container
         run: |
