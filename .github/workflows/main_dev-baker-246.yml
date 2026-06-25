@@ -44,7 +44,7 @@ jobs:
         run: |
           az acr build \
             --registry ${{ env.ACR_NAME }} \
-            --image $IMAGE \
+            --image ${{ env.IMAGE }} \
             .
             
       - name: Deploy Web App container
