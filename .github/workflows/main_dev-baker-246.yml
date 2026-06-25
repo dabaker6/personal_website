@@ -13,16 +13,16 @@ permissions:
   id-token: write 
   contents: read
 
-env:
-  ACR_NAME: ${{secrets.PERSONAL_WEBSITE_ACR_NAME}}
-  IMAGE_NAME: ${{secrets.PERSONAL_WEBSITE_IMAGE_NAME}}
-  IMAGE_TAG: v1.${{ github.sha }}
-  WEBAPP_NAME: ${{secrets.PERSONAL_WEBSITE_WEBAPP_NAME}}
-  RESOURCE_GROUP: ${{secrets.PERSONAL_WEBSITE_RG}}
-  IMAGE: "${{secrets.PERSONAL_WEBSITE_IMAGE_NAME}}:v1.${{ github.sha }}"
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      ACR_NAME: ${{secrets.PERSONAL_WEBSITE_ACR_NAME}}
+      IMAGE_NAME: ${{secrets.PERSONAL_WEBSITE_IMAGE_NAME}}
+      IMAGE_TAG: v1.${{ github.sha }}
+      WEBAPP_NAME: ${{secrets.PERSONAL_WEBSITE_WEBAPP_NAME}}
+      RESOURCE_GROUP: ${{secrets.PERSONAL_WEBSITE_RG}}
+      IMAGE: "${{secrets.PERSONAL_WEBSITE_IMAGE_NAME}}:v1.${{ github.sha }}"
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4          
@@ -37,8 +37,8 @@ jobs:
       - name: Debug ACR name
         run: | 
           echo "ACR Name: ${{ env.ACR_NAME }}"      
-          echo "Image: $IMAGE
-          echo "Image: ${{ env.IMAGE }}
+          echo "Image: $IMAGE"
+          echo "Image: ${{ env.IMAGE }}"
           
       - name: Build and push image      
         run: |
@@ -59,6 +59,5 @@ jobs:
       - name: Restart Web App
         run: |
           az webapp restart \
-            --name $WEBAPP_NAME \
-            --resource-group $RESOURCE_GROUP
-          
+            --name ${{ env.WEBAPP_NAME }} \
+            --resource-group $}{{ env.RESOURCE_GROUP }}        
