@@ -19,7 +19,7 @@ env:
   IMAGE_TAG: v1.${{ github.sha }}
   WEBAPP_NAME: ${{secrets.PERSONAL_WEBSITE_WEBAPP_NAME}}
   RESOURCE_GROUP: ${{secrets.PERSONAL_WEBSITE_RG}}
-
+  IMAGE: "${{secrets.PERSONAL_WEBSITE_IMAGE_NAME}}:v1.${{ github.sha }}"
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -36,22 +36,24 @@ jobs:
       
       - name: Debug ACR name
         run: | 
-          echo "ACR Name: $ACR_NAME"      
-      
+          echo "ACR Name: ${{ env.ACR_NAME }}"      
+          echo "Image: ${{ env.IMAGE }}
+          echo "Image: $Image
+          
       - name: Build and push image      
         run: |
           az acr build \
-            --registry $ACR_NAME \
-            --image "$IMAGE_NAME:$IMAGE_TAG" \
+            --registry ${{ env.ACR_NAME }} \
+            --image $IMAGE \
             .
             
       - name: Deploy Web App container
         run: |
-          IMAGE="$ACR_NAME.azurecr.io/$IMAGE_NAME:$IMAGE_TAG"
+          IMAGE="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
 
           az webapp config container set \
-            --name $WEBAPP_NAME \
-            --resource-group $RESOURCE_GROUP \
+            --name ${{ env.WEBAPP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
             --container-image-name $IMAGE
 
       - name: Restart Web App
