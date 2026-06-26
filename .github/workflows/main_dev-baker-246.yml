@@ -43,7 +43,7 @@ jobs:
       - name: Build and push image      
         run: |
           az acr build \
-            --registry ${{ env.ACR_NAME }} \
+            --registry acrpersonalwebsite \
             --image ${{ env.IMAGE }} \
             .
             
