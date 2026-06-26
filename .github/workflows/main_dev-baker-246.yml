@@ -37,9 +37,11 @@ jobs:
       - name: Set subscription
         run: az account set --subscription 24a80093-ad0a-4e31-87a9-62777107ecb2      
       
-      - name: Debug ACR name
-        run: | 
-          az acr list -o table
+      - name: Debug ACR access
+        run: |
+          az account show
+          az acr show --name $ACR_NAME
+          az acr list --output table
           
       - name: Build and push image      
         run: |
