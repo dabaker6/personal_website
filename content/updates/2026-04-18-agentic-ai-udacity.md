@@ -85,6 +85,4 @@ The course is genuinely intermediate-to-advanced. It assumes you're comfortable 
 
 The ideas, concepts and patterns will be particuarly useful, and have given me a number of ideas for side projects to include in the site.
 
-And finally a link to the certificate...
-
-https://www.udacity.com/certificate/e/4c29853e-4f6b-11f1-af3c-3fd9b932afba
+And finally a link to the [certificate](https://www.udacity.com/certificate/e/4c29853e-4f6b-11f1-af3c-3fd9b932afba)
