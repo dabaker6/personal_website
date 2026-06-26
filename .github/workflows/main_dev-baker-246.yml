@@ -43,15 +43,15 @@ jobs:
             
       - name: Deploy Web App container
         run: |
-          IMAGE="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+          IMAGE="$ACR_NAME.azurecr.io/$IMAGE_NAME:$IMAGE_TAG"
 
           az webapp config container set \
-            --name ${{ env.WEBAPP_NAME }} \
-            --resource-group ${{ env.RESOURCE_GROUP }} \
-            --container-image-name $IMAGE
+            --name $WEBAPP_NAME \
+            --resource-group $RESOURCE_GROUP \
+            --docker-custom-image-name $IMAGE
 
       - name: Restart Web App
         run: |
           az webapp restart \
-            --name ${{ env.WEBAPP_NAME }} \
-            --resource-group ${{ env.RESOURCE_GROUP }}        
+            --name $WEBAPP_NAME \
+            --resource-group $RESOURCE_GROUP       
