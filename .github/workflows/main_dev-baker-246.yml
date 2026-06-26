@@ -34,12 +34,12 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
             
-      - name: Build and push image      
+      - name: Build and push image
         run: |
-          az acr build \
-            --registry ${{ env.ACR_NAME }} \
-            --image ${{ env.IMAGE }} \
-            .
+          az acr login --name $ACR_NAME
+          IMAGE="$ACR_NAME.azurecr.io/$IMAGE"
+          docker build -t $IMAGE .
+          docker push $IMAGE
             
       - name: Deploy Web App container
         run: |
