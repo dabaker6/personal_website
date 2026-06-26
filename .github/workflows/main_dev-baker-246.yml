@@ -34,6 +34,16 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       
+      - name: Debug identity
+        run: |
+          az account show
+          az identity show \
+            --name github-oidc \
+            --resource-group rg-personal-website \
+            --query "{clientId:clientId, principalId:principalId}" \
+            --output table
+          az acr list --output table
+      
       - name: Debug ACR access
         run: |
           az account show
