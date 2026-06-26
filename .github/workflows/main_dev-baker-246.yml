@@ -41,8 +41,6 @@ jobs:
         run: |
           az account show
           az acr list --output table
-          az acr show --name $ACR_NAME
-          
           
       - name: Build and push image      
         run: |
