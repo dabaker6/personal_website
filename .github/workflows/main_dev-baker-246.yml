@@ -39,9 +39,7 @@ jobs:
       
       - name: Debug ACR name
         run: | 
-          echo "ACR Name: ${{ env.ACR_NAME }}"      
-          echo "Image: $IMAGE"
-          echo "Image: ${{ env.IMAGE }}"
+          az acr list -o table
           
       - name: Build and push image      
         run: |
