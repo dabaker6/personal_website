@@ -17,12 +17,12 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     env:
-      ACR_NAME: ${{secrets.PERSONAL_WEBSITE_ACR_NAME}}
-      IMAGE_NAME: ${{secrets.PERSONAL_WEBSITE_IMAGE_NAME}}
+      ACR_NAME: ${{ secrets.PERSONAL_WEBSITE_ACR_NAME }}
+      IMAGE_NAME: ${{ secrets.PERSONAL_WEBSITE_IMAGE_NAME }}
       IMAGE_TAG: v1.${{ github.sha }}
-      WEBAPP_NAME: ${{secrets.PERSONAL_WEBSITE_WEBAPP_NAME}}
-      RESOURCE_GROUP: ${{secrets.PERSONAL_WEBSITE_RG}}
-      IMAGE: "${{secrets.PERSONAL_WEBSITE_IMAGE_NAME}}:v1.${{ github.sha }}"
+      WEBAPP_NAME: ${{ secrets.PERSONAL_WEBSITE_WEBAPP_NAME }}
+      RESOURCE_GROUP: ${{ secrets.PERSONAL_WEBSITE_RG }}
+      IMAGE: "${{ secrets.PERSONAL_WEBSITE_IMAGE_NAME }}:v1.${{ github.sha }}"
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4          
@@ -30,12 +30,9 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2
         with:
-          client-id: 4b0b20b3-9594-4be2-ae60-354264130830
+          client-id: ${{ secrets.AZURE_GITHUB_OIDC }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      
-      - name: Set subscription
-        run: az account set --subscription 24a80093-ad0a-4e31-87a9-62777107ecb2      
       
       - name: Debug ACR access
         run: |
@@ -45,8 +42,8 @@ jobs:
       - name: Build and push image      
         run: |
           az acr build \
-            --registry acrpersonalwebsite \
-            --image test:latest1 \
+            --registry ${{ env.ACR_NAME }} \
+            --image ${{ env.IMAGE }} \
             .
             
       - name: Deploy Web App container
