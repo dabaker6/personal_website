@@ -30,7 +30,7 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_GITHUB_OIDC }}
+          client-id: 7da2310b-0d78-43b6-a6bf-f0c9769a9aa7
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       
