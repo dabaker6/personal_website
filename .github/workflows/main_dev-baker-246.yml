@@ -35,7 +35,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       
       - name: Set subscription
-        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}      
+        run: az account set --subscription 24a80093-ad0a-4e31-87a9-62777107ecb2      
       
       - name: Debug ACR name
         run: | 
