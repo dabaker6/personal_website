@@ -1,6 +1,6 @@
 ---
 title: "Homelab Project: update monitoring"
-date: 2026-06-10
+date: 2026-06-19
 tags:
   - learning
   - homelab
