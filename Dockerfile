@@ -11,8 +11,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the application code
 COPY . .
 
+RUN useradd -m appuser && chown -R appuser /app
+USER appuser
+
 # Expose port 80 for Azure App Service
-EXPOSE 80
+EXPOSE 8000
 
 # Run the application with Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:80", "app:create_app()"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:create_app()"]

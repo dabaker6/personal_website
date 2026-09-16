@@ -14,9 +14,7 @@ venv/
 env/
 
 # Exclude environment files
-.env
-.env.local
-.env.production
+**/.env*
 
 # Exclude tests
 tests/
@@ -34,3 +32,9 @@ specs/
 
 # Exclude Docker files themselves if needed
 docker-compose*.yml
+
+#Exclude spec-kit workflow
+.claude/
+.specify/
+.github/
+CLAUDE.md
