@@ -32,14 +32,7 @@ jobs:
 
   build-and-deploy:
     needs: test
-    runs-on: ubuntu-latest
-    env:
-      ACR_NAME: ${{ secrets.PERSONAL_WEBSITE_ACR_NAME }}
-      IMAGE_NAME: ${{ secrets.PERSONAL_WEBSITE_IMAGE_NAME }}
-      IMAGE_TAG: v1.${{ github.sha }}
-      WEBAPP_NAME: 
-      RESOURCE_GROUP: 
-      IMAGE: "${{ secrets.PERSONAL_WEBSITE_IMAGE_NAME }}:v1.${{ github.sha }}"
+    runs-on: ubuntu-latest    
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4          
@@ -60,7 +53,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: $ {{ steps.img.outputs.ref }}
+          tags: ${{ steps.img.outputs.ref }}
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
