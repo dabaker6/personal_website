@@ -190,7 +190,7 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
                 format_date_range=format_date_range,
                 graph_model=graph_model,
                 back_url=url_for("matches", **query.to_query_params()),
-            ), status_code
+            )
 
         return render_template(
             "match_detail.html",
