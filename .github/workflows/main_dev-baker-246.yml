@@ -12,7 +12,13 @@ on:
 permissions:
   id-token: write 
   contents: read
+  packages: write
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_TAG: v1.${{ github.sha }}
+  
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -26,18 +32,32 @@ jobs:
 
   build-and-deploy:
     needs: test
-    runs-on: ubuntu-latest
-    env:
-      ACR_NAME: ${{ secrets.PERSONAL_WEBSITE_ACR_NAME }}
-      IMAGE_NAME: ${{ secrets.PERSONAL_WEBSITE_IMAGE_NAME }}
-      IMAGE_TAG: v1.${{ github.sha }}
-      WEBAPP_NAME: ${{ secrets.PERSONAL_WEBSITE_WEBAPP_NAME }}
-      RESOURCE_GROUP: ${{ secrets.PERSONAL_WEBSITE_RG }}
-      IMAGE: "${{ secrets.PERSONAL_WEBSITE_IMAGE_NAME }}:v1.${{ github.sha }}"
+    runs-on: ubuntu-latest    
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4          
-        
+
+      - name: Construct image reference
+        id: img
+        run: echo "ref=${REGISTRY}/${IMAGE_NAME@L}:${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.img.outputs.ref }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+  
       - name: Azure Login
         uses: azure/login@v2
         with:
@@ -45,24 +65,15 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
             
-      - name: Build and push image
+      - name: Point Web App at the GHCR image
         run: |
-          az acr login --name $ACR_NAME
-          IMAGE="$ACR_NAME.azurecr.io/$IMAGE"
-          docker build -t $IMAGE .
-          docker push $IMAGE
-            
-      - name: Deploy Web App container
-        run: |
-          IMAGE="$ACR_NAME.azurecr.io/$IMAGE_NAME:$IMAGE_TAG"
-
           az webapp config container set \
-            --name $WEBAPP_NAME \
-            --resource-group $RESOURCE_GROUP \
-            --docker-custom-image-name $IMAGE
-
+            --name ${{ secrets.PERSONAL_WEBSITE_WEBAPP_NAME }} \
+            --resource-group ${{ secrets.PERSONAL_WEBSITE_RG }} \
+            --container-image-name "${{ steps.img.outputs.ref }}"
+            
       - name: Restart Web App
         run: |
           az webapp restart \
-            --name $WEBAPP_NAME \
-            --resource-group $RESOURCE_GROUP       
+            --name ${{ secrets.PERSONAL_WEBSITE_WEBAPP_NAME }} \
+            --resource-group ${{ secrets.PERSONAL_WEBSITE_RG }}       
