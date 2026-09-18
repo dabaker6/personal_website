@@ -112,6 +112,8 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
         if entry is None:
             abort(404)
 
+        assert entry is not None
+
         return render_template(
             "update_detail.html",
             page={
@@ -154,7 +156,7 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
         )
 
     @app.route("/matches/<match_id>")
-    def match_detail(match_id: str) -> str:
+    def match_detail(match_id: str) -> str | tuple[str, int]:
         query = BrowseQuery.from_args(request.args.to_dict(flat=True))
         graph_model = {
             "availability": "unavailable",
@@ -190,7 +192,7 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
                 format_date_range=format_date_range,
                 graph_model=graph_model,
                 back_url=url_for("matches", **query.to_query_params()),
-            )
+            ), status_code
 
         return render_template(
             "match_detail.html",
@@ -233,7 +235,7 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
         )
 
     @app.route("/scaling/api/status")
-    def scaling_api_status():
+    def scaling_api_status() -> tuple[dict, int] | dict:
         try:
             revision_name = get_revision_name()
             replica_count = get_replica_count(revision_name)
@@ -248,7 +250,7 @@ def create_app(content_overrides: dict[str, Any] | None = None) -> Flask:
         })
 
     @app.route("/scaling/api/send", methods=["POST"])
-    def scaling_api_send():
+    def scaling_api_send() -> tuple[dict, int]:
         data = request.get_json(silent=True) or {}
         count = data.get("count")
 
