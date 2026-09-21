@@ -44,6 +44,32 @@ You can also tune request timeout behavior (default: 10 seconds):
 $env:MATCHES_API_TIMEOUT_SECONDS = "15"
 ```
 
+## Run in docker
+
+# 1. bump requirements.txt, then:
+```
+docker build -t personal-website:test .
+```
+# 2. run it
+```
+docker run --rm -p 8000:8000 personal-website:test
+```
+
+# Tests
+```
+curl.exe -i http://localhost:8000/
+curl.exe -s -o NUL -w "%{http_code}`n" http://localhost:8000/about
+curl.exe -s -o NUL -w "%{http_code}`n" http://localhost:8000/updates
+```
+
+## Run Trivy locally
+
+```
+winget install AquaSecurity.Trivy
+trivy image --severity HIGH,CRITICAL --ignore-unfixed personal-website:test
+```
+
+
 ## Run tests
 
 ```powershell
