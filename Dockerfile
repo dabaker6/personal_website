@@ -1,17 +1,30 @@
-# Use Python 3.13 slim image as base
+# builder
+FROM python:3.13-slim AS builder
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# runtime
 FROM python:3.13-slim
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH" \
+    PYTHONONWRITEBYTECODE=1 \
+    PYTHONBUFFERED=1
 
 # Set working directory
 WORKDIR /app
 
-# Copy requirements and install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
 # Copy the application code
 COPY . .
 
-RUN useradd -m appuser && chown -R appuser /app
+RUN rm -rf /usr/local/lib/python3.*/site-packages/pip \
+        /usr/local/lib/python3.*/site-packages/pip-*.dist-info \
+        /opt/venv/lib/python3.*/site-packages/pip \
+        /opt/venv/lib/python3.*/site-packages/pip-*.dist-info \
+    && useradd -m -u 1000 appuser \
+    && chown -R appuser /app
+
 USER appuser
 
 # Expose port 80 for Azure App Service
