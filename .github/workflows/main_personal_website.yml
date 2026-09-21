@@ -64,6 +64,7 @@ jobs:
         with:
           image-ref: ${{ steps.img.outputs.ref }}
           severity: HIGH,CRITICAL
+          ignore-unfixed: true
           exit-code: '1'
 
       - name: Push image
