@@ -44,7 +44,7 @@ jobs:
       - name: Scan image
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          image-ref: ${{ steps.img.outputs.ref }}
           severity: HIGH,CRITICAL
           exit-code: '1'
       
