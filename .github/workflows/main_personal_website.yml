@@ -40,14 +40,7 @@ jobs:
       - name: Construct image reference
         id: img
         run: echo "ref=${REGISTRY}/${IMAGE_NAME@L}:${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
-      
-      - name: Scan image
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{ steps.img.outputs.ref }}
-          severity: HIGH,CRITICAL
-          exit-code: '1'
-      
+
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
@@ -55,15 +48,26 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: build and push
+      - name: build image
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: true
+          load: true
+          push: false
           tags: ${{ steps.img.outputs.ref }}
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
+
+      - name: Scan image
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ steps.img.outputs.ref }}
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+
+      - name: Push image
+        run: docker push ${{ steps.img.outputs.ref }}
   
       - name: Azure Login
         uses: azure/login@v2
