@@ -9,10 +9,7 @@ on:
     branches:
       - main
 
-permissions:
-  id-token: write 
-  contents: read
-  packages: write
+permissions: {}
 
 env:
   REGISTRY: ghcr.io
@@ -23,19 +20,24 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions: 
+      contents: read
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - run: pip install -r requirements-dev.txt
-      - run: pytest
-    
+      - run: pytest    
 
   build-and-deploy:
     needs: test
     runs-on: ubuntu-latest    
     timeout-minutes: 10
+    permissions:      
+      id-token: write 
+      contents: read
+      packages: write      
     steps:
       - name: Checkout repo
         uses: actions/checkout@v7        
