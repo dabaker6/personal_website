@@ -9,10 +9,7 @@ on:
     branches:
       - main
 
-permissions:
-  id-token: write 
-  contents: read
-  packages: write
+permissions: {}
 
 env:
   REGISTRY: ghcr.io
@@ -22,17 +19,31 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions: 
+      contents: read
+    concurrency:
+      group: ${{ github.workflow }}-test-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - run: pip install -r requirements-dev.txt
-      - run: pytest
+      - run: pytest    
 
   build-and-deploy:
     needs: test
     runs-on: ubuntu-latest    
+    timeout-minutes: 10
+    permissions:
+      id-token: write 
+      contents: read
+      packages: write      
+    concurrency:
+      group: ${{ github.workflow }}-test-${{ github.ref }}
+      cancel-in-progress: false      
     steps:
       - name: Checkout repo
         uses: actions/checkout@v7        
@@ -88,4 +99,13 @@ jobs:
         run: |
           az webapp restart \
             --name ${{ secrets.PERSONAL_WEBSITE_WEBAPP_NAME }} \
-            --resource-group ${{ secrets.PERSONAL_WEBSITE_RG }}       
+            --resource-group ${{ secrets.PERSONAL_WEBSITE_RG }}     
+
+      - name: Smoke test
+        run: |
+          for i in {1..10}; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" https://david-baker.co.uk)
+            [ "$code" = "200" ] && exit 0
+            sleep 10
+          done
+          echo "Site did not return 200 after deploy"; exit 1
