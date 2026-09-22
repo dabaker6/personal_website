@@ -42,7 +42,7 @@ jobs:
       contents: read
       packages: write      
     concurrency:
-      group: ${{ github.workflow }}-test-${{ github.ref }}
+      group: ${{ github.workflow }}-deploy-${{ github.ref }}
       cancel-in-progress: false      
     steps:
       - name: Checkout repo
