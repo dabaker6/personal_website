@@ -15,7 +15,9 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   IMAGE_TAG: v1.${{ github.sha }}
-  
+  WEBAPP_NAME: ${{ secrets.PERSONAL_WEBSITE_WEBAPP_NAME }}
+  WEBAPP_RESOURCEGROUP: ${{ secrets.PERSONAL_WEBSITE_RG }} 
+    
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -91,15 +93,15 @@ jobs:
       - name: Point Web App at the GHCR image
         run: |
           az webapp config container set \
-            --name ${{ secrets.PERSONAL_WEBSITE_WEBAPP_NAME }} \
-            --resource-group ${{ secrets.PERSONAL_WEBSITE_RG }} \
+            --name ${{ env.WEBAPP_NAME }} \
+            --resource-group ${{ env.WEBAPP_RESOURCEGROUP }} \
             --container-image-name "${{ steps.img.outputs.ref }}"
             
       - name: Restart Web App
         run: |
           az webapp restart \
-            --name ${{ secrets.PERSONAL_WEBSITE_WEBAPP_NAME }} \
-            --resource-group ${{ secrets.PERSONAL_WEBSITE_RG }}     
+            --name ${{ env.WEBAPP_NAME }} \
+            --resource-group ${{ env.WEBAPP_RESOURCEGROUP }}     
 
       - name: Smoke test
         id: smoke
