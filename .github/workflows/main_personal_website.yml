@@ -102,10 +102,15 @@ jobs:
             --resource-group ${{ secrets.PERSONAL_WEBSITE_RG }}     
 
       - name: Smoke test
+        id: smoke
+        env:
+          SITE_URL: https://david-baker.co.uk/
         run: |
           for i in {1..10}; do
-            code=$(curl -s -o /dev/null -w "%{http_code}" https://david-baker.co.uk)
-            [ "$code" = "200" ] && exit 0
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$SITE_URL" || true)
+            echo "attempt $i: HTTP $code"
+            [ "$code" = "200" ] && { echo "Healthy after $i attempt(s)"; exit 0; }
             sleep 10
           done
-          echo "Site did not return 200 after deploy"; exit 1
+          echo "::error::Site did not return 200 after deploy (last code: $code)"
+          exit 1
