@@ -57,7 +57,7 @@ jobs:
       - name: Log in to GHCR
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: $REGISTRY
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -73,7 +73,7 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
 
       - name: Scan image
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 #v 0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ${{ steps.img.outputs.ref }}
           severity: HIGH,CRITICAL
@@ -93,8 +93,8 @@ jobs:
       - name: Point Web App at the GHCR image
         run: |
           az webapp config container set \
-            --name ${{ env.WEBAPP_NAME }} \
-            --resource-group ${{ env.WEBAPP_RESOURCEGROUP }} \
+            --name $WEBAPP_NAME \
+            --resource-group $WEBAPP_RESOURCEGROUP \
             --container-image-name "${{ steps.img.outputs.ref }}"
             
       - name: Restart Web App
