@@ -43,8 +43,6 @@ jobs:
     permissions:      
       contents: read
       packages: write      
-    outputs:
-      ref: ${{ steps.img.outputs.ref }} # will output to next job
     concurrency:
       group: ${{ github.workflow }}-test-${{ github.ref }}
       cancel-in-progress: true      
@@ -104,13 +102,17 @@ jobs:
           client-id: ${{ secrets.AZURE_GITHUB_OIDC }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-            
+
+      - name: Construct image reference
+        id: img
+        run: echo "ref=${REGISTRY}/${IMAGE_NAME@L}:${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+
       - name: Point Web App at the GHCR image
         run: |
           az webapp config container set \
             --name $WEBAPP_NAME \
             --resource-group $WEBAPP_RESOURCEGROUP \
-            --container-image-name "${{ needs.build-and-push.outputs.ref }}"
+            --container-image-name "${{ steps.img.outputs.ref }}"
             
       - name: Restart Web App
         run: |
