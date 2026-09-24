@@ -104,6 +104,18 @@ jobs:
           az webapp restart \
             --name ${{ env.WEBAPP_NAME }} \
             --resource-group ${{ env.WEBAPP_RESOURCEGROUP }}     
+            
+      - name: Ensure correct image loaded
+        run: |
+          configured_image=$(az webapp config show \
+            --name ${{ env.WEBAPP_NAME }} \
+            --resource-group ${{ env.WEBAPP_RESOURCEGROUP }} \
+            --query linuxFxVersion -o tsv)
+          echo "configured image: $configured_image"
+          case "$configured_image" in
+            *"${{ github.sha }}"*) echo "Image matches commit" ;;
+            *) echo "::error:: App uses $configured_image, expected ${{ github.sha }}"; exit 1 ;;
+            esac
 
       - name: Smoke test
         id: smoke
