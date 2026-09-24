@@ -36,18 +36,18 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: pytest    
 
-  build-and-deploy:
+  build-and-push:
     needs: test
     runs-on: ubuntu-latest    
     timeout-minutes: 10
-    permissions:
-      id-token: write 
+    permissions:      
       contents: read
       packages: write      
+    outputs:
+      ref: ${{ steps.img.outputs.ref }} # will output to next job
     concurrency:
-      group: ${{ github.workflow }}-deploy-${{ github.ref }}
-      cancel-in-progress: false  
-    if: github.ref == 'refs/heads/main'
+      group: ${{ github.workflow }}-test-${{ github.ref }}
+      cancel-in-progress: true      
     steps:
       - name: Checkout repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1        
@@ -83,8 +83,21 @@ jobs:
           exit-code: '1'
 
       - name: Push image
+        if: github.event_name != 'pull_request' # only push when deploying
         run: docker push ${{ steps.img.outputs.ref }}
-  
+        
+  deploy:
+    needs: build-and-push
+    if: github.event_name != 'pull_request' && github.ref == 'refs/head/main'
+    runs-on: ubuntu-latest    
+    timeout-minutes: 10
+    permissions:      
+      contents: read
+      id-token: write
+    concurrency:
+      group: ${{ github.workflow }}-deploy-${{ github.ref }}
+      cancel-in-progress: false      
+    steps:
       - name: Azure Login
         uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
         with:
@@ -97,7 +110,7 @@ jobs:
           az webapp config container set \
             --name $WEBAPP_NAME \
             --resource-group $WEBAPP_RESOURCEGROUP \
-            --container-image-name "${{ steps.img.outputs.ref }}"
+            --container-image-name "${{ needs.build-and-push.outputs.ref }}"
             
       - name: Restart Web App
         run: |
