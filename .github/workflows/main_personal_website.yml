@@ -37,7 +37,7 @@ jobs:
           pip install -r requirements-dev.txt
           pytest
           echo "sha in test: $GITHUB_SHA"
-          
+          echo "image tag: $IMAGE_TAG"
   build-and-push:
     needs: test
     runs-on: ubuntu-latest    
