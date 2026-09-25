@@ -15,7 +15,7 @@ permissions: {}
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  IMAGE_TAG: v1.${{ github.sha }}.${{ github.run_id }} # tag is version, commit sha and workflow run id
+  IMAGE_TAG: ${{ github.sha }}.${{ github.run_id }} # tag is version, commit sha and workflow run id
   WEBAPP_NAME: ${{ vars.PERSONAL_WEBSITE_WEBAPP_NAME }}
   WEBAPP_RESOURCEGROUP: ${{ vars.PERSONAL_WEBSITE_RG }} 
     
