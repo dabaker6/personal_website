@@ -15,7 +15,7 @@ permissions: {}
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  IMAGE_TAG: v1.${{ github.sha }}
+  IMAGE_TAG: v1.${{ github.sha }}.${{ github.run_id }} # tag is version, commit sha and workflow run id
   WEBAPP_NAME: ${{ vars.PERSONAL_WEBSITE_WEBAPP_NAME }}
   WEBAPP_RESOURCEGROUP: ${{ vars.PERSONAL_WEBSITE_RG }} 
     
@@ -45,7 +45,9 @@ jobs:
       packages: write      
     concurrency:
       group: ${{ github.workflow }}-test-${{ github.ref }}
-      cancel-in-progress: true      
+      cancel-in-progress: true 
+    outputs:
+      digest: ${{ steps.push.outputs.digest }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1        
@@ -82,9 +84,20 @@ jobs:
           exit-code: '1'
 
       - name: Push image
+        id: push
         if: github.event_name != 'pull_request' # only push when deploying
-        run: docker push ${{ steps.img.outputs.ref }}
-        
+        run: |
+          name="${REGISTRY}/${IMAGE_NAME@L}"
+          ref="${{ steps.img.outputs.ref }}"
+          docker push "$ref"
+         
+          digest=$(docker inspect --format='{{range .RepoDigests}}{{println .}}{{end}}' "$ref" \
+            | grep "^${name}@" | head -n1 | cut -d@ -f2) 
+          : "${digest:?could not resolve digest after push}"
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo "Pushed ${name}@{digest}"
+          echo "- Image: \`${name}@${digest}\`" >> "$GITHUB_STEP_SUMMARY"
+        # selects the manifest digest of the image | filters for only this registry | splits on '@' then takes the second field which is the sha       
   deploy:
     needs: build-and-push
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
@@ -106,10 +119,11 @@ jobs:
 
       - name: Construct image reference
         id: img
-        run: echo "ref=${REGISTRY}/${IMAGE_NAME@L}:${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+        run: echo "ref=${REGISTRY}/${IMAGE_NAME@L}:${IMAGE_TAG}"
 
       - name: Point Web App at the GHCR image
         run: |
+          image="${{ steps.img.outputs.ref }}@${{ needs.build-and-push.outputs.digest }}"
           az webapp config container set \
             --name $WEBAPP_NAME \
             --resource-group $WEBAPP_RESOURCEGROUP \
