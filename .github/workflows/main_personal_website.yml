@@ -161,9 +161,9 @@ jobs:
       - name: Smoke test
         id: smoke
         env:
-          SITE_URL: https://david-baker.co.uk/
+          SITE_URL: https://david-baker.co.uk/uknown-link
         run: |
-          for i in {1..10}; do
+          for i in {1..2}; do
             code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "${SITE_URL}" || true)
             echo "attempt $i: HTTP ${code}"
             [ "${code}" = "200" ] && { echo "Healthy after ${i} attempt(s)"; exit 0; }
