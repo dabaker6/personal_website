@@ -95,7 +95,7 @@ jobs:
             | grep "^${name}@" | head -n1 | cut -d@ -f2) 
           : "${digest:?could not resolve digest after push}"
           echo "digest=$digest" >> "$GITHUB_OUTPUT"
-          echo "Pushed ${name}@{digest}"
+          echo "Pushed ${name}@${digest}"
           echo "- Image: \`${name}@${digest}\`" >> "$GITHUB_STEP_SUMMARY"
         # selects the manifest digest of the image | filters for only this registry | splits on '@' then takes the second field which is the sha       
   deploy:
@@ -119,7 +119,7 @@ jobs:
 
       - name: Construct image reference
         id: img
-        run: echo "ref=${REGISTRY}/${IMAGE_NAME@L}:${IMAGE_TAG}"
+        run: echo "ref=${REGISTRY}/${IMAGE_NAME@L}:${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
 
       - name: Point Web App at the GHCR image
         run: |
