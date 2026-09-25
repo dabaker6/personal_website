@@ -19,7 +19,7 @@ env:
   WEBAPP_NAME: ${{ vars.PERSONAL_WEBSITE_WEBAPP_NAME }}
   WEBAPP_RESOURCEGROUP: ${{ vars.PERSONAL_WEBSITE_RG }} 
     
-jobs:
+jobs:  
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -33,9 +33,11 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.13'
-      - run: pip install -r requirements-dev.txt
-      - run: pytest    
-
+      - run: |
+          pip install -r requirements-dev.txt
+          pytest
+          echo "sha in test: $GITHUB_SHA"
+          
   build-and-push:
     needs: test
     runs-on: ubuntu-latest    
@@ -114,7 +116,7 @@ jobs:
             echo "| Tag | \`${IMAGE_TAG}\` |"
             echo "| Scan | ${{ steps.scan.outcome }} |"
             echo "| Push | ${{ steps.push.outcome }} |"
-            echo "| Digest | \`${DIGEST}\` |"
+            echo "| Digest | \`${DIGEST:none}\` |"
           } >> "$GITHUB_STEP_SUMMARY"
           
   deploy:
