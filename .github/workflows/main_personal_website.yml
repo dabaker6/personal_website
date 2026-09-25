@@ -95,7 +95,7 @@ jobs:
           name="${REGISTRY}/${IMAGE_NAME@L}"
           ref="${{ steps.img.outputs.ref }}"
           docker push "$ref"         
-          digest=$(docker inspect --format='{{range .RepoDigests}}{{println .}}{{end}}' "$ref" \
+          digest=$(docker inspect --format='{{range .RepoDigests}}{{println .}}{{end}}' "$ref" |
             | grep "^${name}@" | head -n1 | cut -d@ -f2) 
           : "${digest:?could not resolve digest after push}"
           echo "digest=$digest" >> "$GITHUB_OUTPUT"
@@ -212,7 +212,7 @@ jobs:
         if: always()
         env:
           DIGEST: ${{ needs.build-and-push.outputs.digest }}
-          PREVIOUS_IMAGE: ${{ steps.webapp_img.outputs.previous }}
+          PREVIOUS_IMAGE: ${{ steps.webapp_img.outputs.previous_image }}
         run: |
           {
             echo "### Deploy"
@@ -220,7 +220,7 @@ jobs:
             echo "| | |"
             echo "|---|---|"
             echo "| App | \`${WEBAPP_NAME}\` |"
-            echo "| Deployed |  \`${REGISTRY}/${IMAGE_NAME@L}/{DIGEST}\` |"
+            echo "| Deployed |  \`${REGISTRY}/${IMAGE_NAME@L}@${DIGEST}\` |"
             echo "| Previous | \`${PREVIOUS_IMAGE:-none}\` |"
             echo "| Verify | ${{ steps.verify.outcome }} |"
             echo "| Smoke | ${{ steps.smoke.outcome }} |"
