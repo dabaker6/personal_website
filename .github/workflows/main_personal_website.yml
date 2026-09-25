@@ -36,11 +36,7 @@ jobs:
       - run: |
           pip install -r requirements-dev.txt
           pytest
-          echo "sha in test: $GITHUB_SHA"
-          echo "image tag: $IMAGE_TAG"
-          echo "tag length: ${#IMAGE_TAG}"
-          echo "tag spaced: $(echo "$IMAGE_TAG" | sed 's/./& /g')"
-          echo "sha length: ${#GITHUB_SHA}"
+
   build-and-push:
     needs: test
     runs-on: ubuntu-latest    
@@ -123,7 +119,7 @@ jobs:
             echo "| Tag | \`${IMAGE_TAG}\` |"
             echo "| Scan | ${{ steps.scan.outcome }} |"
             echo "| Push | ${{ steps.push.outcome }} |"
-            echo "| Digest | \`${DIGEST:none}\` |"
+            echo "| Digest | \`${DIGEST:"No digest recorded"}\` |"
           } >> "$GITHUB_STEP_SUMMARY"
           
   deploy:
