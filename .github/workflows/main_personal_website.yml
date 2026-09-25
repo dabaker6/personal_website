@@ -33,7 +33,8 @@ jobs:
         id: actionLint
         uses: raven-actions/actionlint@3d39aea434753780c3b3d4a1a31c854b4dbf49d7 # v2.2.0
           
-  test:    
+  test:
+    needs: lint-workflow
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions: 
@@ -109,7 +110,7 @@ jobs:
           ref="${{ steps.img.outputs.ref }}"
           docker push "$ref"         
           digest=$(docker inspect --format='{{range .RepoDigests}}{{println .}}{{end}}' "$ref" |
-            | grep "^${name}@" | head -n1 | cut -d@ -f2) 
+            grep "^${name}@" | head -n1 | cut -d@ -f2) 
           : "${digest:?could not resolve digest after push}"
           echo "digest=$digest" >> "$GITHUB_OUTPUT"
           echo "Pushed ${name}@${digest}"
