@@ -95,7 +95,7 @@ jobs:
           name="${REGISTRY}/${IMAGE_NAME@L}"
           ref="${{ steps.img.outputs.ref }}"
           docker push "$ref"         
-          digest=$(docker inspect --format='{{range .RepoDigests}}{{println .}}{{end}}' "$ref" \ 
+          digest=$(docker inspect --format='{{range .RepoDigests}}{{println .}}{{end}}' "$ref" \
             | grep "^${name}@" | head -n1 | cut -d@ -f2) 
           : "${digest:?could not resolve digest after push}"
           echo "digest=$digest" >> "$GITHUB_OUTPUT"
