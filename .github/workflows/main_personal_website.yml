@@ -119,7 +119,7 @@ jobs:
             echo "| Tag | \`${IMAGE_TAG}\` |"
             echo "| Scan | ${{ steps.scan.outcome }} |"
             echo "| Push | ${{ steps.push.outcome }} |"
-            echo "| Digest | \`${DIGEST:"No digest recorded"}\` |"
+            echo "| Digest | \`${DIGEST:-none}\` |"
           } >> "$GITHUB_STEP_SUMMARY"
           
   deploy:
