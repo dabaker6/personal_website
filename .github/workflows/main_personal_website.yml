@@ -8,8 +8,11 @@ on:
   push:
     branches:
       - main
-  pull_request:   
-  
+  pull_request:
+  schedule:
+    - cron: '17 4 * * 1' # runs at 4:17 every monday. 
+  workflow_dispatch:
+    
 permissions: {}
 
 env:
@@ -125,6 +128,7 @@ jobs:
             echo ""
             echo "| | |"
             echo "|---|---|"
+            echo "| Trigger | ${{ github.event_name }} |"
             echo "| Commit | \`${GITHUB_SHA}\` |"
             echo "| Tag | \`${IMAGE_TAG}\` |"
             echo "| Scan | ${{ steps.scan.outcome }} |"
@@ -238,5 +242,5 @@ jobs:
             echo "| Previous | \`${PREVIOUS_IMAGE:-none}\` |"
             echo "| Verify | ${{ steps.verify.outcome }} |"
             echo "| Smoke | ${{ steps.smoke.outcome }} |"
-            echo "| Rolled back | ${{ steps.rollback.outcome }} |"
+            echo "| Roll back | ${{ steps.rollback.outcome }} |"
           } >> "$GITHUB_STEP_SUMMARY"
