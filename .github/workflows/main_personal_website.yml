@@ -30,7 +30,7 @@ jobs:
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1  
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 #v7.0.0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.13'
       - run: pip install -r requirements-dev.txt
@@ -44,7 +44,7 @@ jobs:
       contents: read
       packages: write      
     concurrency:
-      group: ${{ github.workflow }}-test-${{ github.ref }}
+      group: ${{ github.workflow }}-build-${{ github.ref }}
       cancel-in-progress: true 
     outputs:
       digest: ${{ steps.push.outputs.digest }}
@@ -76,6 +76,7 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
 
       - name: Scan image
+        id: scan
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ${{ steps.img.outputs.ref }}
@@ -117,35 +118,45 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Construct image reference
-        id: img
-        run: echo "ref=${REGISTRY}/${IMAGE_NAME@L}:${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
-
-      - name: Point Web App at the GHCR image
+      - name: Get current image
+        id: webapp_img
         run: |
-          image="${{ steps.img.outputs.ref }}@${{ needs.build-and-push.outputs.digest }}"
+          current_image=$(az webapp config container show --name "$WEBAPP_NAME" --resource-group "$WEBAPP_RESOURCEGROUP" \
+            --query "[?name=='DOCKER_CUSTOM_IMAGE_NAME'].value | [0]" -o tsv | cut -d'|' -f2)          
+          echo "previous_image=${current_image}" >> "$GITHUB_OUTPUT"
+          echo "Current image running: ${current_image}"
+          
+      - name: Point Web App at the GHCR image
+        env:
+          DIGEST: ${{ needs.build-and-push.outputs.digest }} 
+        run: |
+          : "${DIGEST:?digest missing from build and push}"
+          image="${REGISTRY}/${IMAGE_NAME@L}@${DIGEST}"
           az webapp config container set \
-            --name $WEBAPP_NAME \
-            --resource-group $WEBAPP_RESOURCEGROUP \
+            --name "$WEBAPP_NAME" \
+            --resource-group "$WEBAPP_RESOURCEGROUP" \
             --container-image-name "$image"
             
       - name: Restart Web App
         run: |
           az webapp restart \
-            --name ${{ env.WEBAPP_NAME }} \
-            --resource-group ${{ env.WEBAPP_RESOURCEGROUP }}     
+            --name "$WEBAPP_NAME" \
+            --resource-group "$WEBAPP_RESOURCEGROUP"     
             
       - name: Ensure correct image loaded
+        env:
+          EXPECTED_DIGEST: ${{ needs.build-and-push.outputs.digest }}
         run: |
+          : "${EXPECTED_DIGEST:?digest missing from build and push}"
           configured_image=$(az webapp config show \
-            --name ${{ env.WEBAPP_NAME }} \
-            --resource-group ${{ env.WEBAPP_RESOURCEGROUP }} \
+            --name "$WEBAPP_NAME" \
+            --resource-group "$WEBAPP_RESOURCEGROUP" \
             --query linuxFxVersion -o tsv)
-          echo "configured image: $configured_image"
+          echo "configured image: ${configured_image}"
           case "$configured_image" in
-            *"${{ github.sha }}"*) echo "Image matches commit" ;;
-            *) echo "::error:: App uses $configured_image, expected ${{ github.sha }}"; exit 1 ;;
-            esac
+            *"${EXPECTED_DIGEST}"*) echo "Image matches digest" ;;
+            *) echo "::error::App uses ${configured_image}, expected ${EXPECTED_DIGEST}"; exit 1 ;;
+          esac
 
       - name: Smoke test
         id: smoke
@@ -153,10 +164,25 @@ jobs:
           SITE_URL: https://david-baker.co.uk/
         run: |
           for i in {1..10}; do
-            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$SITE_URL" || true)
-            echo "attempt $i: HTTP $code"
-            [ "$code" = "200" ] && { echo "Healthy after $i attempt(s)"; exit 0; }
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "${SITE_URL}" || true)
+            echo "attempt $i: HTTP ${code}"
+            [ "${code}" = "200" ] && { echo "Healthy after ${i} attempt(s)"; exit 0; }
             sleep 10
           done
-          echo "::error::Site did not return 200 after deploy (last code: $code)"
+          echo "::error::Site did not return 200 after deploy (last code: ${code})"
+          exit 1
+
+      - name: Roll back
+        if: failure() && steps.smoke.outcome == 'failure' && steps.webapp_img.outputs.previous_image != '' 
+        env:
+          PREVIOUS_IMAGE: "${{ steps.webapp_img.outputs.previous_image }}"        
+        run: |
+          echo "::warning::Smoke test failed, reverting to ${PREVIOUS_IMAGE}"
+          az webapp config container set \
+            --name "$WEBAPP_NAME" \
+            --resource-group "$WEBAPP_RESOURCEGROUP" \
+            --container-image-name "$PREVIOUS_IMAGE"
+          az webapp restart \
+            --name "$WEBAPP_NAME" \
+            --resource-group "$WEBAPP_RESOURCEGROUP"  
           exit 1
