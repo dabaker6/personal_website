@@ -127,7 +127,7 @@ jobs:
           az webapp config container set \
             --name $WEBAPP_NAME \
             --resource-group $WEBAPP_RESOURCEGROUP \
-            --container-image-name "${{ steps.img.outputs.ref }}"
+            --container-image-name "$image"
             
       - name: Restart Web App
         run: |
