@@ -87,18 +87,36 @@ jobs:
       - name: Push image
         id: push
         if: github.event_name != 'pull_request' # only push when deploying
-        run: |
+        # Pushes image then grabs the digest
+        # selects the manifest digest of the image | filters for only this registry | splits on '@' then takes the second field 
+        # The second field in the sha of the digest
+        run: | 
           name="${REGISTRY}/${IMAGE_NAME@L}"
           ref="${{ steps.img.outputs.ref }}"
-          docker push "$ref"
-         
-          digest=$(docker inspect --format='{{range .RepoDigests}}{{println .}}{{end}}' "$ref" \
+          docker push "$ref"         
+          digest=$(docker inspect --format='{{range .RepoDigests}}{{println .}}{{end}}' "$ref" \ 
             | grep "^${name}@" | head -n1 | cut -d@ -f2) 
           : "${digest:?could not resolve digest after push}"
           echo "digest=$digest" >> "$GITHUB_OUTPUT"
           echo "Pushed ${name}@${digest}"
-          echo "- Image: \`${name}@${digest}\`" >> "$GITHUB_STEP_SUMMARY"
-        # selects the manifest digest of the image | filters for only this registry | splits on '@' then takes the second field which is the sha       
+
+      - name: Build summary
+        if: always()
+        env:
+          DIGEST: ${{ steps.push.outputs.digest }}
+        run: |
+          {
+            echo "### Build"
+            echo ""
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Commit | \`${GITHUB_SHA}\` |"
+            echo "| Tag | \`${IMAGE_TAG}\` |"
+            echo "| Scan | ${{ steps.scan.outcome }} |"
+            echo "| Push | ${{ steps.push.outcome }} |"
+            echo "| Digest | \`${DIGEST}\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          
   deploy:
     needs: build-and-push
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
@@ -144,6 +162,7 @@ jobs:
             --resource-group "$WEBAPP_RESOURCEGROUP"     
             
       - name: Ensure correct image loaded
+        id: verify
         env:
           EXPECTED_DIGEST: ${{ needs.build-and-push.outputs.digest }}
         run: |
@@ -173,6 +192,7 @@ jobs:
           exit 1
 
       - name: Roll back
+        id: rollback
         if: failure() && steps.smoke.outcome == 'failure' && steps.webapp_img.outputs.previous_image != '' 
         env:
           PREVIOUS_IMAGE: "${{ steps.webapp_img.outputs.previous_image }}"        
@@ -186,3 +206,22 @@ jobs:
             --name "$WEBAPP_NAME" \
             --resource-group "$WEBAPP_RESOURCEGROUP"  
           exit 1
+
+      - name: Deploy Summary
+        if: always()
+        env:
+          DIGEST: ${{ needs.build-and-push.outputs.digest }}
+          PREVIOUS_IMAGE: ${{ steps.webapp_img.outputs.previous }}
+        run: |
+          {
+            echo "### Deploy"
+            echo ""
+            echo "| | |"
+            echo "|---|---|"
+            echo "| App | \`${WEBAPP_NAME}\` |"
+            echo "| Deployed |  \`${REGISTRY}/${IMAGE_NAME@L}/{DIGEST}\` |"
+            echo "| Previous | \`${PREVIOUS_IMAGE:-none}\` |"
+            echo "| Verify | ${{ steps.verify.outcome }} |"
+            echo "| Smoke | ${{ steps.smoke.outcome }} |"
+            echo "| Rolled back | ${{ steps.rollback.outcome }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
