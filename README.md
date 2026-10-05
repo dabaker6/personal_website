@@ -64,8 +64,11 @@ curl.exe -s -o NUL -w "%{http_code}`n" http://localhost:8000/updates
 
 ## Run Trivy locally
 
+Need to ensure a single manifest is produced, so turn off attestation
+
 ```
 winget install AquaSecurity.Trivy
+docker build --provenance=false --sbom=false -t personal-website:test
 trivy image --severity HIGH,CRITICAL --ignore-unfixed personal-website:test
 ```
 
